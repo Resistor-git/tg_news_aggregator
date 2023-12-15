@@ -12,9 +12,8 @@ from datetime import datetime, timedelta
 from config_data.config import Config, load_config
 
 config: Config = load_config()
-# foobar1
-# foobar2
-# foobar3
+# time_period =
+
 
 # Создание клиента Pyrogram
 app = Client(
@@ -49,10 +48,7 @@ app = Client(
 #     get_channel_messages('@echofm_online')
 
 
-channel = 'svtvnews'
-
-
-def get_channel_messages(channel_name):
+def get_channel_messages(channel_name: str) -> None:
     messages = app.get_chat_history(channel_name, limit=10)
 
     for message in messages:
@@ -60,5 +56,8 @@ def get_channel_messages(channel_name):
             print(message.caption.split('\n')[0])
             print(message.link, '\n')
 
+
 with app:
-    get_channel_messages(channel)
+    for channel in config.channels:
+        print(f'Новости канала {channel}:\n')
+        get_channel_messages(channel)
