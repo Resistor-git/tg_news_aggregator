@@ -12,7 +12,8 @@ from datetime import datetime, timedelta
 from config_data.config import Config, load_config
 
 config: Config = load_config()
-# time_period =
+time_period: timedelta = timedelta(hours=24)
+time_of_oldest_message: datetime = datetime.now() - time_period
 
 
 # Создание клиента Pyrogram
@@ -49,7 +50,7 @@ app = Client(
 
 
 def get_channel_messages(channel_name: str) -> None:
-    messages = app.get_chat_history(channel_name, limit=10)
+    messages = app.get_chat_history(channel_name, limit=100, offset_date=time_of_oldest_message)
 
     for message in messages:
         if message.caption:
