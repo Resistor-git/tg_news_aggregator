@@ -12,6 +12,7 @@ class TgBot:
 class Config:
     tg_bot: TgBot
     channels: list
+    time_period: int
 
 
 def load_config(path: str | None = None) -> Config:
@@ -22,5 +23,6 @@ def load_config(path: str | None = None) -> Config:
             api_id=env('API_ID'),
             api_hash=env('API_HASH')
         ),
-        channels=env.list('CHANNELS')
+        channels=env.list('CHANNELS'),
+        time_period=env.int('TIME_PERIOD_MINUTES')
     )
