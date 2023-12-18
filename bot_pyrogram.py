@@ -4,7 +4,7 @@
 # список каналов
 # отправление сообщения в телегу
 
-
+import asyncio
 from datetime import datetime, timedelta
 from typing import AsyncGenerator
 
@@ -15,10 +15,18 @@ from config_data.config import Config, load_config
 config: Config = load_config()
 
 
-app = Client(
+# с помощью compose() запустить несколько ботов
+userbot = Client(
+    'my_userbot',
+    config.tg_userbot.api_id,
+    config.tg_userbot.api_hash
+)
+
+bot = Client(
     'my_bot',
     config.tg_bot.api_id,
-    config.tg_bot.api_hash
+    config.tg_bot.api_hash,
+    config.tg_bot.bot_token
 )
 
 
@@ -27,7 +35,7 @@ def get_channel_messages(channel_name: str) -> None:
     Gets messages from channels for the period of time.
     """
     _time_of_oldest_message: datetime = datetime.now() - timedelta(minutes=config.time_period)
-    messages: AsyncGenerator = app.get_chat_history(channel_name, limit=100)
+    messages: AsyncGenerator = userbot.get_chat_history(channel_name, limit=100)
 
     for message in messages:
         if message.caption and message.date > _time_of_oldest_message:
@@ -35,7 +43,11 @@ def get_channel_messages(channel_name: str) -> None:
             print(message.link, '\n')
 
 
-with app:
+with userbot:
     for channel in config.channels:
         print(f'Новости канала {channel}:\n')
         get_channel_messages(channel)
+
+with bot:
+    bot.send_message(chat_id=5897335213, text='foo111')
+
