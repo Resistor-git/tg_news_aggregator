@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from typing import AsyncGenerator
 
 from pyrogram import Client
+from pyrogram.types import Message
 
 from config_data.config import Config, load_config
 
@@ -30,23 +31,36 @@ bot = Client(
 )
 
 
-def get_channel_messages(channel_name: str) -> None:
+def get_channel_messages(channel_name: str) -> list[Message]:
     """
     Gets messages from channels for the period of time.
     """
     _time_of_oldest_message: datetime = datetime.now() - timedelta(minutes=config.time_period)
     messages: AsyncGenerator = userbot.get_chat_history(channel_name, limit=100)
+    filtered_messages = []
+
+    # for message in messages:
+    #     if message.caption and message.date > _time_of_oldest_message:
+    #         print(message.caption.split('\n')[0])
+    #         print(message.link, '\n')
 
     for message in messages:
         if message.caption and message.date > _time_of_oldest_message:
-            print(message.caption.split('\n')[0])
-            print(message.link, '\n')
+            filtered_messages.append(message)
+
+    return filtered_messages
+
+
+def get_data_from_messages(messages):
+    for message in messages:
+        print(message.caption.split('\n')[0])
+        print(message.link, '\n')
 
 
 with userbot:
     for channel in config.channels:
         print(f'Новости канала {channel}:\n')
-        get_channel_messages(channel)
+        get_data_from_messages(get_channel_messages(channel))
 
 with bot:
     bot.send_message(chat_id=5897335213, text='foo111')
