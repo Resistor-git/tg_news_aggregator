@@ -31,7 +31,7 @@ bot = Client(
 )
 
 
-def get_channel_messages(channel_name: str) -> list[Message]:
+async def get_channel_messages(channel_name: str) -> list[Message]:
     """
     Gets messages from channels for the period of time.
     """
@@ -39,12 +39,7 @@ def get_channel_messages(channel_name: str) -> list[Message]:
     messages: AsyncGenerator = userbot.get_chat_history(channel_name, limit=100)
     filtered_messages = []
 
-    # for message in messages:
-    #     if message.caption and message.date > _time_of_oldest_message:
-    #         print(message.caption.split('\n')[0])
-    #         print(message.link, '\n')
-
-    for message in messages:
+    async for message in messages:
         if message.caption and message.date > _time_of_oldest_message:
             filtered_messages.append(message)
 
@@ -57,11 +52,15 @@ def get_data_from_messages(messages):
         print(message.link, '\n')
 
 
-with userbot:
-    for channel in config.channels:
-        print(f'Новости канала {channel}:\n')
-        get_data_from_messages(get_channel_messages(channel))
+async def main():
+    async with userbot:
+        for channel in config.channels:
+            print(f'Новости канала {channel}:\n')
+            get_data_from_messages(await get_channel_messages(channel))
 
-with bot:
-    bot.send_message(chat_id=5897335213, text='foo111')
+    async with bot:
+        await bot.send_message(chat_id=5897335213, text='foo111')
 
+
+userbot.run(main())
+bot.run(main())
