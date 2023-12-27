@@ -75,9 +75,13 @@ def test_answer(client, message):
         text=f'got the message: {message.text}'
     )
     with userbot:
-        messages = userbot.get_chat_history('vestiru24', limit=100)
-        for message in messages:
+        posts = userbot.get_chat_history('vestiru24', limit=100)
+        for post in posts:
             # print(message.caption)
-            print(message.text)
+            print(post.text)
+        bot.send_message(
+            chat_id=message.chat.id,
+            text=f'posts methods: {dir(posts)}'
+        )
 
 bot.run()
