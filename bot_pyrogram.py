@@ -20,7 +20,8 @@ config: Config = load_config()
 userbot = Client(
     'my_userbot',
     config.tg_userbot.api_id,
-    config.tg_userbot.api_hash
+    config.tg_userbot.api_hash,
+    no_updates=True
 )
 
 bot = Client(
@@ -30,37 +31,53 @@ bot = Client(
     config.tg_bot.bot_token
 )
 
+####################
+# async def get_channel_messages(channel_name: str) -> list[Message]:
+#     """
+#     Gets messages from channels for the period of time.
+#     """
+#     _time_of_oldest_message: datetime = datetime.now() - timedelta(minutes=config.time_period)
+#     messages: AsyncGenerator = userbot.get_chat_history(channel_name, limit=100)
+#     filtered_messages = []
 
-async def get_channel_messages(channel_name: str) -> list[Message]:
-    """
-    Gets messages from channels for the period of time.
-    """
-    _time_of_oldest_message: datetime = datetime.now() - timedelta(minutes=config.time_period)
-    messages: AsyncGenerator = userbot.get_chat_history(channel_name, limit=100)
-    filtered_messages = []
+#     async for message in messages:
+#         if message.caption and message.date > _time_of_oldest_message:
+#             filtered_messages.append(message)
 
-    async for message in messages:
-        if message.caption and message.date > _time_of_oldest_message:
-            filtered_messages.append(message)
-
-    return filtered_messages
-
-
-def get_data_from_messages(messages):
-    for message in messages:
-        print(message.caption.split('\n')[0])
-        print(message.link, '\n')
+#     return filtered_messages
 
 
-async def main():
-    async with userbot:
-        for channel in config.channels:
-            print(f'Новости канала {channel}:\n')
-            get_data_from_messages(await get_channel_messages(channel))
-
-    async with bot:
-        await bot.send_message(chat_id=5897335213, text='foo111')
+# def get_data_from_messages(messages):
+#     for message in messages:
+#         print(message.caption.split('\n')[0])
+#         print(message.link, '\n')
 
 
-userbot.run(main())
-bot.run(main())
+# async def main():
+#     async with userbot:
+#         for channel in config.channels:
+#             print(f'Новости канала {channel}:\n')
+#             get_data_from_messages(await get_channel_messages(channel))
+
+#     async with bot:
+#         await bot.send_message(chat_id=5897335213, text='foo111')
+
+
+# # userbot.run(main())
+# bot.run(main())
+##############
+
+# запуск бота реагирующего на команду
+@bot.on_message()
+def test_answer(client, message):
+    bot.send_message(
+        chat_id=message.chat.id,
+        text=f'got the message: {message.text}'
+    )
+    with userbot:
+        messages = userbot.get_chat_history('vestiru24', limit=100)
+        for message in messages:
+            # print(message.caption)
+            print(message.text)
+
+bot.run()
