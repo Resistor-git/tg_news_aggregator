@@ -15,7 +15,6 @@ from config_data.config import Config, load_config
 
 config: Config = load_config()
 
-
 # с помощью compose() запустить несколько ботов
 userbot = Client(
     'my_userbot',
@@ -30,6 +29,7 @@ bot = Client(
     config.tg_bot.api_hash,
     config.tg_bot.bot_token
 )
+
 
 ####################
 # async def get_channel_messages(channel_name: str) -> list[Message]:
@@ -67,21 +67,69 @@ bot = Client(
 # bot.run(main())
 ##############
 
-# запуск бота реагирующего на команду
+def get_channel_messages(channel_name: str) -> list[Message]:
+    """
+    Gets messages from channels for the period of time.
+    """
+    _time_of_oldest_message: datetime = datetime.now() - timedelta(minutes=config.time_period)
+    messages: AsyncGenerator = userbot.get_chat_history(channel_name, limit=100)
+    filtered_messages = []
+
+    for message in messages:
+        if message.date > _time_of_oldest_message:
+            if message.sender_chat.username == 'echoonline_news' and message.text:
+                filtered_messages.append(message)
+            elif (message.sender_chat.username in ('svtvnews', 'news_sirena', 'fontankaspb') and
+                  message.caption):
+                filtered_messages.append(message)
+    return filtered_messages
+
+
+def get_data_from_messages(messages):
+    """
+    Returns first paragraphs of messages and links to them.
+    Different channels may have different message structure.
+    """
+    headers: list[tuple[str, str]] = []
+    for message in messages:
+        if message.sender_chat.username == 'echoonline_news':
+            news_message = message.text.split('\n')[0]
+            news_link = message.link
+            headers.append((news_message, news_link))
+        elif message.sender_chat.username in ('svtvnews', 'news_sirena', 'fontankaspb'):
+            news_message = message.caption.split('\n')[0]
+            news_link = message.link
+            headers.append((news_message, news_link))
+    return headers
+
+
+def final_message_for_user(data: list[tuple[str, str]]):
+    """
+    Creates a final message for user.
+    Combines all headers and links to messages into one string.
+    """
+    result = ''
+    for tup in data:
+        result += f'{tup[0]},\n{tup[1]}\n'
+    return result
+
+
 @bot.on_message()
-def test_answer(client, message):
+def aggregate_news(client, message):
     bot.send_message(
         chat_id=message.chat.id,
         text=f'got the message: {message.text}'
     )
+    news = ''
+
     with userbot:
-        posts = userbot.get_chat_history('vestiru24', limit=100)
-        for post in posts:
-            # print(message.caption)
-            print(post.text)
-        bot.send_message(
-            chat_id=message.chat.id,
-            text=f'posts methods: {dir(posts)}'
-        )
+        for channel in config.channels:
+            news += f'{final_message_for_user(get_data_from_messages(get_channel_messages(channel)))}\n'
+
+    bot.send_message(
+        chat_id=message.chat.id,
+        text=news
+    )
+
 
 bot.run()
