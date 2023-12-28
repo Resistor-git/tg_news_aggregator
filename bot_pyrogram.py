@@ -5,10 +5,12 @@
 # отправление сообщения в телегу
 
 import asyncio
+import textwrap
+import time
 from datetime import datetime, timedelta
 from typing import AsyncGenerator
 
-from pyrogram import Client
+from pyrogram import Client, errors
 from pyrogram.types import Message
 
 from config_data.config import Config, load_config
@@ -82,7 +84,7 @@ def get_channel_messages(channel_name: str) -> list[Message]:
             elif (message.sender_chat.username in ('svtvnews', 'news_sirena', 'fontankaspb') and
                   message.caption):
                 filtered_messages.append(message)
-    return filtered_messages
+    return list(reversed(filtered_messages))
 
 
 def get_data_from_messages(messages):
@@ -103,33 +105,52 @@ def get_data_from_messages(messages):
     return headers
 
 
-def final_message_for_user(data: list[tuple[str, str]]):
+def message_for_user(data: list[tuple[str, str]]) -> str:
     """
     Creates a final message for user.
     Combines all headers and links to messages into one string.
+    Divides message if it is too long.
+    Returns a list of strings.
     """
     result = ''
     for tup in data:
-        result += f'{tup[0]},\n{tup[1]}\n'
+        result += f'{tup[0]}\n{tup[1]}\n'
     return result
+
+
+def split_long_string(text, length=4096) -> list[str]:
+    """
+    Splits long message into smaller.
+    Does not preserve newline characters!!!
+    NOT USED IN THE CURRENT VERSION OF CODE
+    """
+    return textwrap.wrap(text=text, width=length)
 
 
 @bot.on_message()
 def aggregate_news(client, message):
-    bot.send_message(
-        chat_id=message.chat.id,
-        text=f'got the message: {message.text}'
-    )
     news = ''
-
     with userbot:
         for channel in config.channels:
-            news += f'{final_message_for_user(get_data_from_messages(get_channel_messages(channel)))}\n'
-
-    bot.send_message(
-        chat_id=message.chat.id,
-        text=news
-    )
+            news += f'{message_for_user(get_data_from_messages(get_channel_messages(channel)))}\n'
+    try:
+        bot.send_message(
+            chat_id=message.chat.id,
+            text=news
+        )
+    except errors.MessageTooLong:
+        print('too long message')
+        number_of_messages = (len(news) // 4096) + 1
+        start = 0
+        end = 4096
+        for _ in range(number_of_messages):
+            bot.send_message(
+                chat_id=message.chat.id,
+                text=news[start:end]
+            )
+            start += 4096
+            end += 4096
+            time.sleep(1)
 
 
 bot.run()
