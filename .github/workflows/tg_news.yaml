@@ -45,5 +45,5 @@ jobs:
             sudo docker run -d \
               --name tg_news_aggregator_container \
               --env-file .env \
-              ${{ secrets.DOCKERHUB_USERNAME }}/tg_news_aggregator_container
+              ${{ secrets.DOCKERHUB_USERNAME }}/tg_news_aggregator
             sudo docker system prune -f
