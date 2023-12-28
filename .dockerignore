@@ -1,0 +1,10 @@
+.git
+.env
+/venv
+
+# IDE
+.idea
+.vscode
+
+# other
+plan.odt

@@ -1,0 +1,49 @@
+name: tg news aggregator workflow
+
+on:
+  push:
+    branches:
+      - feature/bot-receive-send-messages
+
+jobs:
+  build_and_push_to_docker_hub:
+    name: Push docker image to docker hub
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout repo
+        uses: actions/checkout@v4
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tg_news_aggregator:latest
+      -
+        name: Run docker on remote server using ssh
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
+          script: |
+            cd tg_news_aggregator
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/tg_news_aggregator
+            sudo docker stop tg_news_aggregator_container
+            sudo docker rm tg_news_aggregator_container
+            sudo docker run -d \
+              --name tg_news_aggregator_container \
+              --env-file .env \
+              ${{ secrets.DOCKERHUB_USERNAME }}/tg_news_aggregator_container
+            sudo docker system prune -f
