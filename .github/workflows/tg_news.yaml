@@ -60,5 +60,5 @@ jobs:
             cd tg_news_aggregator
             sudo docker compose -f docker-compose-production.yaml pull
             sudo docker compose -f docker-compose-production.yaml down
-            sudo docker compose -f docker-compose-production.yml up -d
+            sudo docker compose -f docker-compose-production.yaml up -d
             sudo docker system prune -f
