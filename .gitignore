@@ -240,3 +240,4 @@ fabric.properties
 # other
 *plan*
 *.session
+build_container.txt

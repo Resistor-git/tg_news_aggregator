@@ -140,7 +140,7 @@ def aggregate_news(client, message):
             text=news
         )
     except errors.MessageTooLong:
-        print('too long message')
+        print('long message')
         number_of_messages = (len(news) // 4096) + 1
         start = 0
         end = 4096
