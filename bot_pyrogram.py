@@ -16,9 +16,10 @@ from pyrogram.types import Message
 
 from config_data.config import Config, load_config
 
+MAX_MESSAGE_LENGTH = 4096
+
 config: Config = load_config()
 
-# с помощью compose() запустить несколько ботов
 userbot = Client(
     'my_userbot',
     config.tg_userbot.api_id,
@@ -33,42 +34,6 @@ bot = Client(
     config.tg_bot.bot_token
 )
 
-
-####################
-# async def get_channel_messages(channel_name: str) -> list[Message]:
-#     """
-#     Gets messages from channels for the period of time.
-#     """
-#     _time_of_oldest_message: datetime = datetime.now() - timedelta(minutes=config.time_period)
-#     messages: AsyncGenerator = userbot.get_chat_history(channel_name, limit=100)
-#     filtered_messages = []
-
-#     async for message in messages:
-#         if message.caption and message.date > _time_of_oldest_message:
-#             filtered_messages.append(message)
-
-#     return filtered_messages
-
-
-# def get_data_from_messages(messages):
-#     for message in messages:
-#         print(message.caption.split('\n')[0])
-#         print(message.link, '\n')
-
-
-# async def main():
-#     async with userbot:
-#         for channel in config.channels:
-#             print(f'Новости канала {channel}:\n')
-#             get_data_from_messages(await get_channel_messages(channel))
-
-#     async with bot:
-#         await bot.send_message(chat_id=5897335213, text='foo111')
-
-
-# # userbot.run(main())
-# bot.run(main())
-##############
 
 def get_channel_messages(channel_name: str) -> list[Message]:
     """
@@ -88,7 +53,7 @@ def get_channel_messages(channel_name: str) -> list[Message]:
     return list(reversed(filtered_messages))
 
 
-def get_data_from_messages(messages):
+def get_data_from_messages(messages: list) -> list[tuple[str, str]]:
     """
     Returns first paragraphs of messages and links to them.
     Different channels may have different message structure.
@@ -119,7 +84,7 @@ def message_for_user(data: list[tuple[str, str]]) -> str:
     return result
 
 
-def split_long_string(text, length=4096) -> list[str]:
+def split_long_string(text: str, length=MAX_MESSAGE_LENGTH) -> list[str]:
     """
     Splits long message into smaller.
     Does not preserve newline characters!!!
@@ -141,16 +106,16 @@ def aggregate_news(client, message):
         )
     except errors.MessageTooLong:
         print('long message')
-        number_of_messages = (len(news) // 4096) + 1
+        number_of_messages = (len(news) // MAX_MESSAGE_LENGTH) + 1
         start = 0
-        end = 4096
+        end = MAX_MESSAGE_LENGTH
         for _ in range(number_of_messages):
             bot.send_message(
                 chat_id=message.chat.id,
                 text=news[start:end]
             )
-            start += 4096
-            end += 4096
+            start += MAX_MESSAGE_LENGTH
+            end += MAX_MESSAGE_LENGTH
             time.sleep(1)
 
 
