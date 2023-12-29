@@ -3,7 +3,7 @@ name: tg news aggregator workflow
 on:
   push:
     branches:
-      - main
+      - feature/only-summary-messages
 
 jobs:
   build_and_push_to_docker_hub:

@@ -16,8 +16,6 @@ from pyrogram.types import Message
 
 from config_data.config import Config, load_config
 
-MAX_MESSAGE_LENGTH = 4096
-
 config: Config = load_config()
 
 userbot = Client(
@@ -84,7 +82,7 @@ def message_for_user(data: list[tuple[str, str]]) -> str:
     return result
 
 
-def split_long_string(text: str, length=MAX_MESSAGE_LENGTH) -> list[str]:
+def split_long_string(text: str, length=config.max_message_length) -> list[str]:
     """
     Splits long message into smaller.
     Does not preserve newline characters!!!
@@ -106,17 +104,29 @@ def aggregate_news(client, message):
         )
     except errors.MessageTooLong:
         print('long message')
-        number_of_messages = (len(news) // MAX_MESSAGE_LENGTH) + 1
+        number_of_messages = (len(news) // config.max_message_length) + 1
         start = 0
-        end = MAX_MESSAGE_LENGTH
+        end = config.max_message_length
         for _ in range(number_of_messages):
             bot.send_message(
                 chat_id=message.chat.id,
                 text=news[start:end]
             )
-            start += MAX_MESSAGE_LENGTH
-            end += MAX_MESSAGE_LENGTH
+            start += config.max_message_length
+            end += config.max_message_length
             time.sleep(1)
+    except errors.MessageEmpty:
+        bot.send_message(
+            chat_id=message.chat.id,
+            text='Извините, что-то пошло не так.'
+        )
+        if config.admin_chat_id:
+            bot.send_message(
+                chat_id=config.admin_chat_id,
+                text=f'Возникла ошибка: MessageEmpty'
+                     f'Запрос пользователя:'
+                     f'{message}'
+            )
 
 
 bot.run()
