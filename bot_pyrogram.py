@@ -174,8 +174,10 @@ def digest_filter_and_send(messages: list[Message], user_message: Message) -> No
     """
     digests: list[tuple[str, str]] = []
     for message in messages:
-        _keywords = ('#водномпосте', 'Что произошло к утру', '#Что_происходит')
+        _keywords = ('#водномпосте', 'Что произошло к утру', '#Что_происходит',
+                     'Главное за день', 'Главные события дня', 'Главное за выходные')
         _digest_channels_with_text = ('novaya_europe', 'fontankaspb')
+        _digest_channels_with_captions = ('news_sirena',)
 
         if message.sender_chat.username in _digest_channels_with_text and message.text:
             for keyword in _keywords:
@@ -186,6 +188,15 @@ def digest_filter_and_send(messages: list[Message], user_message: Message) -> No
                         text=f'{message.text}\n'
                              f'Ссылка на оригинал {message.link}'
                     )
+        elif message.sender_chat.username in _digest_channels_with_captions and message.caption:
+            for keyword in _keywords:
+                if keyword in message.caption:
+                    digests.append((message.caption, message.link))
+                    bot.send_message(
+                        chat_id=user_message.chat.id,
+                        text=f'{message.caption}\n'
+                             f'Ссылка на оригинал {message.link}'
+                    )
 
 
 @bot.on_message(filters.command(['digest_24']) | filters.regex('Дайджест за 24 часа'))
@@ -193,8 +204,6 @@ def digest(client, message):
     print('дайджест')
     with userbot:
         for channel in config.channels:
-            # digest_news = ''
-            # digest_news += f'{message_for_user(digest_filter_and_send(get_channel_messages(channel), message))}\n'
             digest_filter_and_send(get_channel_messages(channel), message)
 
 
