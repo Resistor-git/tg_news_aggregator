@@ -1,8 +1,8 @@
 # todo
 # асинхронность 
 # логи
-# список каналов
-# отправление сообщения в телегу
+# заменить названия каналов на id
+# запилить debug режим
 # BUG: разрывается ссылка при делении сообщений
 
 import asyncio
@@ -11,8 +11,8 @@ import time
 from datetime import datetime, timedelta
 from typing import AsyncGenerator
 
-from pyrogram import Client, errors
-from pyrogram.types import Message
+from pyrogram import Client, errors, filters
+from pyrogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 
 from config_data.config import Config, load_config
 
@@ -32,20 +32,37 @@ bot = Client(
     config.tg_bot.bot_token
 )
 
+button_all_news_24 = KeyboardButton('Все новости за 24 часа')
+button_digest_24 = KeyboardButton('Дайджест за 24 часа')
+keyboard = ReplyKeyboardMarkup(
+            [[button_all_news_24], [button_digest_24]],
+            resize_keyboard=True
+)
+
 
 def get_channel_messages(channel_name: str) -> list[Message]:
     """
     Gets messages from channels for the period of time.
     """
     _time_of_oldest_message: datetime = datetime.now() - timedelta(minutes=config.time_period)
-    messages: AsyncGenerator = userbot.get_chat_history(channel_name, limit=100)
+    messages: AsyncGenerator = userbot.get_chat_history(channel_name, limit=config.messages_per_channel_limit)
     filtered_messages = []
+
+    # if config.debug:
+    #     for message in messages:
+    #         print(message)
 
     for message in messages:
         if message.date > _time_of_oldest_message:
-            if message.sender_chat.username == 'echoonline_news' and message.text:
+            if message.sender_chat.username in (
+                    'agentstvonews',
+                    'novaya_europe',
+                    'bbcrussian'
+            ) and message.text:
                 filtered_messages.append(message)
-            elif (message.sender_chat.username in ('svtvnews', 'news_sirena', 'fontankaspb') and
+            elif (message.sender_chat.username in (
+                    'news_sirena',
+                    'fontankaspb') and
                   message.caption):
                 filtered_messages.append(message)
     return list(reversed(filtered_messages))
@@ -91,12 +108,31 @@ def split_long_string(text: str, length=config.max_message_length) -> list[str]:
     return textwrap.wrap(text=text, width=length)
 
 
-@bot.on_message()
+@bot.on_message(filters.command(['start']))
+def start_command(client, message):
+    bot.send_message(
+        chat_id=message.chat.id,
+        text='Кнопки ниже позволяют прочитать все новости за 24 ч. или только выжимку из некоторых каналов.',
+        reply_markup=keyboard
+        )
+
+
+@bot.on_message(filters.command(['all_news_24']) | filters.regex('Все новости за 24 часа'))
 def aggregate_news(client, message):
     news = ''
     with userbot:
         for channel in config.channels:
             news += f'{message_for_user(get_data_from_messages(get_channel_messages(channel)))}\n'
+    if config.debug:
+        print('DEBUG MODE')
+        print(news)
+        bot.send_message(
+            chat_id=message.chat.id,
+            text='Прямо сейчас бот обновляется и поэтому не работает. '
+                 'Пожалуйста, подождите. Если бот недоступен уже несколько часов, '
+                 'сообщите об этом разработчику.'
+        )
+        return
     try:
         bot.send_message(
             chat_id=message.chat.id,
@@ -127,6 +163,17 @@ def aggregate_news(client, message):
                      f'Запрос пользователя:'
                      f'{message}'
             )
+
+
+@bot.on_message(filters.command(['help']))
+def help_command(client, message):
+    bot.send_message(
+        chat_id=message.chat.id,
+        text='/start - Начать работу с ботом (обновить кнопки)\n'
+             '/all_news_24 - Все новости за 24 часа\n'
+             '/digest_24 - Дайджест за 24 часа из избранных источников\n'
+             '/help - Справка/помощь'
+    )
 
 
 bot.run()

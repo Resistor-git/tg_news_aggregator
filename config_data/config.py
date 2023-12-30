@@ -22,6 +22,7 @@ class Config:
     channels: list
     time_period: int
     max_message_length: int
+    messages_per_channel_limit: int
     debug: bool
     admin_chat_id: int | None = None
 
@@ -32,16 +33,17 @@ def load_config(path: str | None = None) -> Config:
     return Config(
         tg_userbot=TgUserBot(
             api_id=env.int('API_ID'),
-            api_hash=env.int('API_HASH')
+            api_hash=env('API_HASH')
         ),
         tg_bot=TgBot(
             api_id=env.int('API_ID'),
-            api_hash=env.int('API_HASH'),
-            bot_token=env.int('BOT_TOKEN')
+            api_hash=env('API_HASH'),
+            bot_token=env('BOT_TOKEN')
         ),
         channels=env.list('CHANNELS'),
         time_period=env.int('TIME_PERIOD_MINUTES'),
         max_message_length=env.int('MAX_MESSAGE_LENGTH'),
+        messages_per_channel_limit=env.int('MESSAGES_PER_CHANNEL_LIMIT'),
         admin_chat_id=env('ADMIN_CHAT_ID'),
         debug=env.bool('DEBUG')
     )
