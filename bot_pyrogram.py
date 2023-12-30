@@ -32,10 +32,10 @@ bot = Client(
     config.tg_bot.bot_token
 )
 
-button_all_news_24 = KeyboardButton('Все новости за 24 часа')
-button_digest_24 = KeyboardButton('Дайджест за 24 часа')
+button_all_news = KeyboardButton('Все новости за 12 часов')
+button_digest = KeyboardButton('Дайджест за 12 часов')
 keyboard = ReplyKeyboardMarkup(
-    [[button_all_news_24], [button_digest_24]],
+    [[button_all_news], [button_digest]],
     resize_keyboard=True
 )
 
@@ -113,12 +113,12 @@ def split_long_string(text: str, length=config.max_message_length) -> list[str]:
 def start_command(client, message):
     bot.send_message(
         chat_id=message.chat.id,
-        text='Кнопки ниже позволяют прочитать все новости за 24 ч. или только выжимку из некоторых каналов.',
+        text='Кнопки ниже позволяют прочитать все новости за 12 ч. или только выжимку из некоторых каналов.',
         reply_markup=keyboard
     )
 
 
-@bot.on_message(filters.command(['all_news_24']) | filters.regex('Все новости за 24 часа'))
+@bot.on_message(filters.command(['all_news']) | filters.regex('Все новости за 12 часов'))
 def all_news(client, message):
     news: str = ''
     with userbot:
@@ -199,7 +199,7 @@ def digest_filter_and_send(messages: list[Message], user_message: Message) -> No
                     )
 
 
-@bot.on_message(filters.command(['digest_24']) | filters.regex('Дайджест за 24 часа'))
+@bot.on_message(filters.command(['digest']) | filters.regex('Дайджест за 12 часов'))
 def digest(client, message):
     print('дайджест')
     with userbot:
@@ -212,8 +212,8 @@ def help_command(client, message):
     bot.send_message(
         chat_id=message.chat.id,
         text='/start - Начать работу с ботом (обновить кнопки)\n'
-             '/all_news_24 - Все новости за 24 часа\n'
-             '/digest_24 - Дайджест за 24 часа из избранных источников\n'
+             '/all_news - Все новости за 12 часов\n'
+             '/digest - Дайджест за 12 часов из избранных источников\n'
              '/help - Справка/помощь'
     )
 
