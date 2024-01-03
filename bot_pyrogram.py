@@ -8,6 +8,8 @@
 import asyncio
 import textwrap
 import time
+import logging
+import logging.handlers
 from datetime import datetime, timedelta
 from typing import AsyncGenerator
 
@@ -15,6 +17,23 @@ from pyrogram import Client, errors, filters
 from pyrogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 
 from config_data.config import Config, load_config
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter("%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s")
+
+file_handler = logging.handlers.RotatingFileHandler(
+    "logs/bot.log", encoding="utf-8", maxBytes=1 * 1024 * 1024, backupCount=2
+)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)
+
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 config: Config = load_config()
 
@@ -153,6 +172,9 @@ def all_news(client, message):
                 f"Запрос пользователя:"
                 f"{message}",
             )
+    logger.info(
+        f"Пользователь {message.from_user.username} воспользовался получением заголовков."
+    )
 
 
 def digest_filter_and_send(messages: list[Message], user_message: Message) -> None:
@@ -199,10 +221,10 @@ def digest_filter_and_send(messages: list[Message], user_message: Message) -> No
 
 @bot.on_message(filters.command(["digest"]) | filters.regex("Дайджест за 12 часов"))
 def digest(client, message):
-    print("дайджест")
     with userbot:
         for channel in config.channels:
             digest_filter_and_send(get_channel_messages(channel), message)
+    logger.info(f"Пользователь {message.from_user.username} воспользовался дайджестом.")
 
 
 @bot.on_message(filters.command(["help"]))

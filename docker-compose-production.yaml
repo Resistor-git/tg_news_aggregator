@@ -9,3 +9,4 @@ services:
     volumes:
       - ./my_bot.session:/app/my_bot.session
       - ./my_userbot.session:/app/my_userbot.session
+      - ./logs:/app/logs
