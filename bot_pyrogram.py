@@ -174,7 +174,8 @@ def digest_filter_and_send(messages: list[Message], user_message: Message) -> No
     """
     digests: list[tuple[str, str]] = []
     for message in messages:
-        _keywords = ('#водномпосте', 'Что произошло к утру', '#Что_происходит',
+        _keywords = ('#водномпосте', 'Что произошло к утру',
+                     'Что произошло за ночь', '#Что_происходит',
                      'Главное за день', 'Главные события дня', 'Главное за выходные')
         _digest_channels_with_text = ('novaya_europe', 'fontankaspb')
         _digest_channels_with_captions = ('news_sirena',)
