@@ -168,13 +168,11 @@ def all_news(client, message):
     )
 
 
-def digest_filter_and_send(messages: list[Message], user_message: Message) -> None:
+def digest_filter(messages: list[Message]) -> list[Message]:
     """
-    Searches for keywords and sends message to user if keyword is found.
-    Unlike all_news func this one returns nothing and sends message itself,
-    no merging of messages, so there is no need to take care of long messages.
+    Filters provided messages by the keywords.
     """
-    digests: list[tuple[str, str]] = []
+    digests: list[Message] = []
     _keywords = (
         "#водномпосте",
         "Что произошло к утру",
@@ -190,30 +188,39 @@ def digest_filter_and_send(messages: list[Message], user_message: Message) -> No
         if message.sender_chat.username in _digest_channels_with_text and message.text:
             for keyword in _keywords:
                 if keyword in message.text:
-                    digests.append((message.text, message.link))
-                    bot.send_message(
-                        chat_id=user_message.chat.id,
-                        text=f"{message.text}\n" f"Ссылка на оригинал {message.link}",
-                    )
+                    digests.append(message)
         elif (
             message.sender_chat.username in _digest_channels_with_captions
             and message.caption
         ):
             for keyword in _keywords:
                 if keyword in message.caption:
-                    digests.append((message.caption, message.link))
-                    bot.send_message(
-                        chat_id=user_message.chat.id,
-                        text=f"{message.caption}\n"
-                        f"Ссылка на оригинал {message.link}",
-                    )
+                    digests.append(message)
+    return digests
 
 
 @bot.on_message(filters.command(["digest"]) | filters.regex("Дайджест за 12 часов"))
 def digest(client, message):
+    """
+    Sends digest messages to the client. If there are no digests, sends informational message.
+    """
+    _empty_digest = True
     with userbot:
         for channel in config.channels:
-            digest_filter_and_send(get_channel_messages(channel), message)
+            digests = digest_filter(get_channel_messages(channel))
+            if len(digests) > 0:
+                _empty_digest = False
+                for digest_message in digests:
+                    bot.send_message(
+                        chat_id=message.chat.id,
+                        text=f"{digest_message.caption}\n"
+                        f"Ссылка на оригинал {digest_message.link}",
+                    )
+    if _empty_digest:
+        bot.send_message(
+            chat_id=message.chat.id,
+            text="К сожалению, дайджесты за последнее время не найдены. Вероятно, их ещё не опубликовали.",
+        )
     logger.info(f"Пользователь {message.from_user.username} воспользовался дайджестом.")
 
 
