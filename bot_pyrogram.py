@@ -1,8 +1,6 @@
 # todo
 # асинхронность
-# логи
 # заменить названия каналов на id
-# запилить debug режим
 # BUG: разрывается ссылка при делении сообщений
 
 import asyncio
@@ -68,17 +66,10 @@ def get_channel_messages(channel_name: str) -> list[Message]:
     )
     filtered_messages = []
 
-    # if config.debug:
-    #     for message in messages:
-    #         print(message)
-
     for message in messages:
         if message.date > _time_of_oldest_message:
-            # if message.sender_chat.username in CHANNELS_WITH_TEXT and message.text:
             if message.sender_chat.username in CHANNELS_WITH_TEXT and message.text:
                 filtered_messages.append(message)
-            # elif (message.sender_chat.username in CHANNELS_WITH_CAPTIONS and
-            #       message.caption):
             elif message.sender_chat.username in CHANNELS_WITH_CAPTIONS:
                 filtered_messages.append(message)
     return list(reversed(filtered_messages))
@@ -154,7 +145,7 @@ def all_news(client, message):
     try:
         bot.send_message(chat_id=message.chat.id, text=news)
     except errors.MessageTooLong:
-        print("long message")
+        logger.debug("long message")
         number_of_messages = (len(news) // config.max_message_length) + 1
         start = 0
         end = config.max_message_length
@@ -180,23 +171,22 @@ def all_news(client, message):
 def digest_filter_and_send(messages: list[Message], user_message: Message) -> None:
     """
     Searches for keywords and sends message to user if keyword is found.
-    devnote: unlike all_news func this one returns nothing and sends message itself,
+    Unlike all_news func this one returns nothing and sends message itself,
     no merging of messages, so there is no need to take care of long messages.
     """
     digests: list[tuple[str, str]] = []
+    _keywords = (
+        "#водномпосте",
+        "Что произошло к утру",
+        "Что произошло за ночь",
+        "#Что_происходит",
+        "Главное за день",
+        "Главные события дня",
+        "Главное за выходные",
+    )
+    _digest_channels_with_text = ("novaya_europe", "fontankaspb")
+    _digest_channels_with_captions = ("news_sirena",)
     for message in messages:
-        _keywords = (
-            "#водномпосте",
-            "Что произошло к утру",
-            "Что произошло за ночь",
-            "#Что_происходит",
-            "Главное за день",
-            "Главные события дня",
-            "Главное за выходные",
-        )
-        _digest_channels_with_text = ("novaya_europe", "fontankaspb")
-        _digest_channels_with_captions = ("news_sirena",)
-
         if message.sender_chat.username in _digest_channels_with_text and message.text:
             for keyword in _keywords:
                 if keyword in message.text:
