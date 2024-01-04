@@ -3,7 +3,7 @@ name: tg news aggregator workflow
 on:
   push:
     branches:
-      - feature/only-summary-messages
+      - main
 
 jobs:
   linter:
