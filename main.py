@@ -1,6 +1,7 @@
 # todo
 # асинхронность
 # заменить названия каналов на id
+# тесты
 # BUG: разрывается ссылка при делении сообщений
 
 from pyrogram import Client
@@ -20,6 +21,7 @@ bot = Client(
     config.tg_bot.bot_token,
     plugins=dict(root="plugins"),
 )
+
 
 if __name__ == "__main__":
     bot.run()
