@@ -1,4 +1,5 @@
 import logging.handlers
+import re
 from datetime import datetime, timedelta
 from typing import AsyncGenerator
 
@@ -88,27 +89,26 @@ def digest_filter(messages: list[Message]) -> list[Message]:
     Filters provided messages by the keywords.
     """
     digests: list[Message] = []
-    _keywords = (
-        "#водномпосте",
-        "Что произошло к утру",
-        "Что произошло за ночь",
-        "#Что_происходит",
-        "Главное за день",
-        "Главные события дня",
-        "Главное за выходные",
+    _keywords = re.compile(
+        r"(.*Утро.*Главное.*)"
+        r"|#водномпосте"
+        r"|Что произошло к утру"
+        r"|Что произошло за ночь"
+        r"|#Что_происходит"
+        r"|Главное за день"
+        r"|Главные события дня",
+        flags=re.IGNORECASE,
     )
     _digest_channels_with_text = ("novaya_europe", "fontankaspb")
     _digest_channels_with_captions = ("news_sirena",)
     for message in messages:
         if message.sender_chat.username in _digest_channels_with_text and message.text:
-            for keyword in _keywords:
-                if keyword in message.text:
-                    digests.append(message)
+            if _keywords.search(message.text):
+                digests.append(message)
         elif (
             message.sender_chat.username in _digest_channels_with_captions
             and message.caption
         ):
-            for keyword in _keywords:
-                if keyword in message.caption:
-                    digests.append(message)
+            if _keywords.search(message.caption):
+                digests.append(message)
     return digests
