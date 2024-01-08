@@ -99,24 +99,22 @@ def digest(client, message):
     Sends digest messages to the client. If there are no digests, sends informational message.
     """
     empty_digest = True
+    if config.debug:
+        client.send_message(
+            chat_id=message.chat.id,
+            text="В данный момент бот обновляется поэтому может выдавать неожиданные результаты или вовсе не отвечать.",
+        )
     with userbot:
         for channel in config.channels:
             digests = digest_filter(get_channel_messages(channel))
             if len(digests) > 0:
                 empty_digest = False
                 for digest_message in digests:
-                    if digest_message.text:
-                        client.send_message(
-                            chat_id=message.chat.id,
-                            text=f"{digest_message.text}\n"
-                            f"Ссылка на оригинал {digest_message.link}",
-                        )
-                    elif digest_message.caption:
-                        client.send_message(
-                            chat_id=message.chat.id,
-                            text=f"{digest_message.caption}\n"
-                            f"Ссылка на оригинал {digest_message.link}",
-                        )
+                    client.forward_messages(
+                        chat_id=message.chat.id,
+                        from_chat_id=digest_message.sender_chat.username,
+                        message_ids=digest_message.id,
+                    )
     if empty_digest:
         client.send_message(
             chat_id=message.chat.id,
