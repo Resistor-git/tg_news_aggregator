@@ -1,9 +1,28 @@
+import logging.handlers
 from datetime import datetime, timedelta
 from typing import AsyncGenerator
 
 from pyrogram.types import Message
 
 from main import config, userbot
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter("%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s")
+
+file_handler = logging.handlers.RotatingFileHandler(
+    "logs/bot.log", encoding="utf-8", maxBytes=1 * 1024 * 1024, backupCount=2
+)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.DEBUG)
+
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
+
 
 CHANNELS_WITH_TEXT = ("agentstvonews", "novaya_europe", "bbcrussian")
 CHANNELS_WITH_CAPTIONS = ("news_sirena", "fontankaspb")
@@ -21,9 +40,11 @@ def get_channel_messages(channel_name: str) -> list[Message]:
         channel_name, limit=config.messages_per_channel_limit
     )
     filtered_messages = []
-
     for message in messages:
         if message.date > time_of_oldest_message:
+            if config.debug:
+                with open("debug.txt", "a", encoding="utf-8") as file:
+                    file.write(f"{message},\n")
             if message.sender_chat.username in CHANNELS_WITH_TEXT and message.text:
                 filtered_messages.append(message)
             elif message.sender_chat.username in CHANNELS_WITH_CAPTIONS:

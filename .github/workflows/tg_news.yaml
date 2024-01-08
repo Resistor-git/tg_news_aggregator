@@ -3,7 +3,7 @@ name: tg news aggregator workflow
 on:
   push:
     branches:
-      - main
+      - architecture/plugins-userbot-import
 
 jobs:
   linter:

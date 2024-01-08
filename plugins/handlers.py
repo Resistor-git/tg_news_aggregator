@@ -105,11 +105,18 @@ def digest(client, message):
             if len(digests) > 0:
                 empty_digest = False
                 for digest_message in digests:
-                    client.send_message(
-                        chat_id=message.chat.id,
-                        text=f"{digest_message.caption}\n"
-                        f"Ссылка на оригинал {digest_message.link}",
-                    )
+                    if digest_message.text:
+                        client.send_message(
+                            chat_id=message.chat.id,
+                            text=f"{digest_message.text}\n"
+                            f"Ссылка на оригинал {digest_message.link}",
+                        )
+                    elif digest_message.caption:
+                        client.send_message(
+                            chat_id=message.chat.id,
+                            text=f"{digest_message.caption}\n"
+                            f"Ссылка на оригинал {digest_message.link}",
+                        )
     if empty_digest:
         client.send_message(
             chat_id=message.chat.id,
