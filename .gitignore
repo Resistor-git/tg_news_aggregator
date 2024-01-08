@@ -239,6 +239,6 @@ fabric.properties
 
 # other
 *plan*
-*.session
+*.session*
 build_container.txt
 *debug*
