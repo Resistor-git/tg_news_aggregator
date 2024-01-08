@@ -89,7 +89,7 @@ def digest_filter(messages: list[Message]) -> list[Message]:
     Filters provided messages by the keywords.
     """
     digests: list[Message] = []
-    _keywords = re.compile(
+    _keywords: re.Pattern = re.compile(
         r"(.*Утро.*Главное.*)"
         r"|#водномпосте"
         r"|Что произошло к утру"
@@ -99,8 +99,8 @@ def digest_filter(messages: list[Message]) -> list[Message]:
         r"|Главные события дня",
         flags=re.IGNORECASE,
     )
-    _digest_channels_with_text = ("novaya_europe", "fontankaspb")
-    _digest_channels_with_captions = ("news_sirena",)
+    _digest_channels_with_text: tuple[str, ...] = ("novaya_europe", "fontankaspb")
+    _digest_channels_with_captions: tuple[str, ...] = ("news_sirena",)
     for message in messages:
         if message.sender_chat.username in _digest_channels_with_text and message.text:
             if _keywords.search(message.text):
