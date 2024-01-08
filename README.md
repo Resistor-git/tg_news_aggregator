@@ -1,5 +1,5 @@
 # tg_news_aggregator
-Provides the headlines of chosen telegram channels for the period of time
+Provides the headlines or digests of chosen telegram channels for the period of time.
 
 #
 Sessions.
