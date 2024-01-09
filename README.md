@@ -35,7 +35,7 @@ How to obtain bot token: https://core.telegram.org/bots/tutorial#obtain-your-bot
 - `TIME_PERIOD_MINUTES` - get news for this period, default value is 720 (hint: 720 is 12 hours, 1440 is 24 hours).
 - `MAX_MESSAGE_LENGTH` - maximus length of message in telegram, used to split too long messages; default value is 4096, higher values will cause error.
 - `MESSAGES_PER_CHANNEL_LIMIT` - amount of messages which userbot will read from one telegram channel; recommended values are from 50 to 100.
-- `ADMIN_CHAT_ID` - optional, sends the message to the according chat if there is some error or any other administrative issue; default value is None.
+- `ADMIN_CHAT_ID` - optional, sends the message to the according chat if there is some error or other administrative issue; default value is empty (literally, nothing after `=`).
 - `DEBUG` - used in code to trigger debug mode; default value is False.
 
 ## GitHub Workflow
