@@ -4,7 +4,7 @@ Provides the headlines or digests of chosen telegram channels for the period of 
 
 ## Bot in action
 To check how it works just try it yourself https://t.me/news_custom_aggregator_bot
-- Press start or send a message `/start/`
+- Press start or send a message `/start`
 - Use the buttons or keyboard to get news or digests from different sources.
 
 ## How to start
