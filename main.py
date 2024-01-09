@@ -1,9 +1,3 @@
-# todo
-# асинхронность
-# заменить названия каналов на id
-# тесты
-# BUG: разрывается ссылка при делении сообщений
-
 from pyrogram import Client
 
 from config_data.config import Config, load_config
