@@ -1,7 +1,4 @@
-import time
-import logging
 import logging.handlers
-
 
 from pyrogram import Client, errors, filters
 from pyrogram.types import ReplyKeyboardMarkup, KeyboardButton
