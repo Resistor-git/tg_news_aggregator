@@ -11,18 +11,18 @@ from main import config
 #     json.dump(users, f, indent=4)
 
 
-users = json.load(open("users_settings.json"))
+users_settings: list[dict] = json.load(open("users/users_settings.json"))
 
 # opens users_settings.json, if user with "id": 222 does not exist, creates it
-with open("users_settings.json", "r+") as f:
-    user_exists = False
-    for user in users:
-        if user["id"] == 222:
-            user_exists = True
-            break
-    if not user_exists:
-        users.append({"id": 222, "channels": ["foo2", "bar2"]})
-        json.dump(users, f, indent=4)
+# with open("users_settings.json", "r+") as f:
+#     user_exists = False
+#     for user in users:
+#         if user["id"] == 222:
+#             user_exists = True
+#             break
+#     if not user_exists:
+#         users.append({"id": 222, "channels": ["foo2", "bar2"]})
+#         json.dump(users, f, indent=4)
 
 # with open("users_settings.json", "w") as f:
 #     users.append({"id": 222, "channels": ["foo2", "bar2"]})

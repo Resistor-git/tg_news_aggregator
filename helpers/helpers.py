@@ -1,4 +1,5 @@
 import logging.handlers
+import json
 import re
 from datetime import datetime, timedelta
 from typing import AsyncGenerator
@@ -6,6 +7,7 @@ from typing import AsyncGenerator
 from pyrogram.types import Message
 
 from main import config, userbot
+from users import users_settings
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -112,3 +114,36 @@ def digest_filter(messages: list[Message]) -> list[Message]:
             if _keywords.search(message.caption):
                 digests.append(message)
     return digests
+
+
+def add_new_user_if_not_exists(user_id: int) -> None:
+    """
+    Adds a new user to the database (json).
+    User is subscribed to all channels by default.
+    """
+    with open("users/users_settings.json", "r+") as f:
+        user_exists = False
+        for user in users_settings:
+            if user["id"] == user_id:
+                user_exists = True
+                break
+        if not user_exists:
+            users_settings.append({"id": user_id, "channels": config.channels})
+            json.dump(users_settings, f, indent=4)
+            logger.info(f"Added new user: {user_id}")
+
+
+# def add_channel(user_id: int, channel: str,):
+#     """
+#     Adds the channel as source of news for the user.
+#     """
+#     with open("users_settings.json", "r+") as f:
+#         user_exists = False
+#         for user in users_settings:
+#             if user["id"] == user_id:
+#                 user_exists = True
+#                 break
+#         if not user_exists:
+#             users_settings.append({"id": user_id, "channels": [channel]})
+#             json.dump(users_settings, f, indent=4)
+#             logger.info(f"Added new user: {user_id} with channel: {[channel]}")

@@ -1,9 +1,7 @@
-import logging
 import logging.handlers
 
-
 from pyrogram import Client, errors, filters
-from pyrogram.types import ReplyKeyboardMarkup, KeyboardButton
+from pyrogram.types import ReplyKeyboardMarkup, KeyboardButton, Message
 
 from main import config, userbot
 from helpers.helpers import (
@@ -11,7 +9,9 @@ from helpers.helpers import (
     get_headers_from_messages,
     message_for_user,
     digest_filter,
+    add_new_user_if_not_exists,
 )
+from users import users_settings
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -33,24 +33,31 @@ logger.addHandler(stream_handler)
 
 button_all_news = KeyboardButton("Все новости за 12 часов")
 button_digest = KeyboardButton("Дайджест за 12 часов")
+button_add_channel = KeyboardButton("Добавить канал")
+button_remove_channel = KeyboardButton("Удалить канал")
+button_add_fontanka = KeyboardButton("Фонтанка")
 keyboard = ReplyKeyboardMarkup(
     [[button_all_news], [button_digest]], resize_keyboard=True
+)
+keyboard_add_remove_channel = ReplyKeyboardMarkup(
+    [[button_add_channel], [button_remove_channel]], resize_keyboard=True
 )
 
 
 @Client.on_message(filters.command(["start"]))
-def start_command(client, message):
+def start_command(client, message: Message):
     client.send_message(
         chat_id=message.chat.id,
         text="Кнопки ниже позволяют прочитать все новости за 12 ч. или только выжимку из некоторых каналов.",
         reply_markup=keyboard,
     )
+    add_new_user_if_not_exists(message.chat.id)
 
 
 @Client.on_message(
     filters.command(["all_news"]) | filters.regex("Все новости за 12 часов")
 )
-def all_news(client, message):
+def all_news(client, message: Message):
     news: str = ""
     with userbot:
         for channel in config.channels:
@@ -93,7 +100,7 @@ def all_news(client, message):
 
 
 @Client.on_message(filters.command(["digest"]) | filters.regex("Дайджест за 12 часов"))
-def digest(client, message):
+def digest(client, message: Message):
     """
     Sends digest messages to the client. If there are no digests, sends informational message.
     """
@@ -122,12 +129,40 @@ def digest(client, message):
     logger.info(f"Пользователь {message.from_user.username} воспользовался дайджестом.")
 
 
+@Client.on_message(filters.command(["settings"]))
+def settings(client, message: Message):
+    """
+    Shows user settings.
+    If user is not registered - adds new user.
+    """
+    add_new_user_if_not_exists(message.chat.id)
+    user_channels = None
+    with open("users/users_settings.json", "r") as f:
+        for user in users_settings:
+            if user["id"] == message.chat.id:
+                user_channels = user["channels"]
+                break
+    if user_channels is None:
+        logger.warning(
+            f"User not found after calling settings().\nUser id: {message.chat.id}"
+        )
+        client.send_message(
+            chat_id=message.chat.id,
+            text=f"Ваши подписки не найдены. Пожалуйста, сообщите разработчику об этой ошибке.",
+        )
+    else:
+        client.send_message(
+            chat_id=message.chat.id, text=f"Ваши текущие подписки: {user_channels}"
+        )
+
+
 @Client.on_message(filters.command(["help"]))
-def help_command(client, message):
+def help_command(client, message: Message):
     client.send_message(
         chat_id=message.chat.id,
         text="/start - Начать работу с ботом (обновить кнопки)\n"
         "/all_news - Все новости за 12 часов\n"
         "/digest - Дайджест за 12 часов из избранных источников\n"
+        "/settings - Управление подписками\n"
         "/help - Справка/помощь",
     )
