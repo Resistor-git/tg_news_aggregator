@@ -1,7 +1,13 @@
 import logging.handlers
 
 from pyrogram import Client, errors, filters
-from pyrogram.types import ReplyKeyboardMarkup, KeyboardButton, Message
+from pyrogram.types import (
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+    Message,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+)
 
 from main import config, userbot
 from helpers.helpers import (
@@ -33,10 +39,14 @@ logger.addHandler(stream_handler)
 
 button_all_news = KeyboardButton("Все новости за 12 часов")
 button_digest = KeyboardButton("Дайджест за 12 часов")
-button_add_channel = KeyboardButton("Добавить канал")
-button_remove_channel = KeyboardButton("Удалить канал")
+button_add_channel = KeyboardButton("Добавить каналы")
+button_remove_channel = KeyboardButton("Удалить каналы")
 button_go_to_start = KeyboardButton("Вернуться к новостям")
+button_add_novaya = KeyboardButton("Новая")
+button_add_bbcrussian = KeyboardButton("BBC")
 button_add_fontanka = KeyboardButton("Фонтанка")
+button_add_sirena = KeyboardButton("Сирена")
+button_add_agentstvo = KeyboardButton("Агентство")
 keyboard = ReplyKeyboardMarkup(
     [[button_all_news], [button_digest]], resize_keyboard=True
 )
@@ -138,7 +148,7 @@ def settings(client, message: Message):
     If user is not registered - adds new user.
     """
     add_new_user_if_not_exists(message.chat.id)
-    user_channels = None
+    user_channels: list[str] | None = None
     with open("users/users_settings.json", "r") as f:
         for user in users_settings:
             if user["id"] == message.chat.id:
@@ -157,6 +167,38 @@ def settings(client, message: Message):
             chat_id=message.chat.id,
             text=f"Ваши текущие подписки: {user_channels}",
             reply_markup=keyboard_add_remove_channels,
+        )
+
+
+@Client.on_message(filters.command(["add_channels"]) | filters.regex("Добавить каналы"))
+def add_channels_keyboard(client, message: Message):
+    """
+    Creates keyboard with available channels.
+    Shows only channels that user is not subscribed to.
+    """
+    user_channels: list[str] | None = None
+    keyboard_add_channels: list[list[KeyboardButton]] = [[button_go_to_start]]
+    channel_to_button = {
+        "fontankaspb": button_add_fontanka,
+        "bbcrussian": button_add_bbcrussian,
+        "novaya_europe": button_add_novaya,
+        "news_sirena": button_add_sirena,
+        "agentstvonews": button_add_agentstvo,
+    }
+    with open("users/users_settings.json", "r") as f:
+        for user in users_settings:
+            if user["id"] == message.chat.id:
+                user_channels = user["channels"]
+                break
+    if user_channels:
+        for channel in user_channels:
+            keyboard_add_channels.append([channel_to_button[channel]])
+        client.send_message(
+            chat_id=message.chat.id,
+            text="Выберите каналы, которые хотите добавить",
+            reply_markup=ReplyKeyboardMarkup(
+                keyboard_add_channels, resize_keyboard=True
+            ),
         )
 
 
