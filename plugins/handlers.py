@@ -35,16 +35,18 @@ button_all_news = KeyboardButton("Все новости за 12 часов")
 button_digest = KeyboardButton("Дайджест за 12 часов")
 button_add_channel = KeyboardButton("Добавить канал")
 button_remove_channel = KeyboardButton("Удалить канал")
+button_go_to_start = KeyboardButton("Вернуться к новостям")
 button_add_fontanka = KeyboardButton("Фонтанка")
 keyboard = ReplyKeyboardMarkup(
     [[button_all_news], [button_digest]], resize_keyboard=True
 )
-keyboard_add_remove_channel = ReplyKeyboardMarkup(
-    [[button_add_channel], [button_remove_channel]], resize_keyboard=True
+keyboard_add_remove_channels = ReplyKeyboardMarkup(
+    [[button_add_channel], [button_remove_channel], [button_go_to_start]],
+    resize_keyboard=True,
 )
 
 
-@Client.on_message(filters.command(["start"]))
+@Client.on_message(filters.command(["start"]) | filters.regex("Вернуться к новостям"))
 def start_command(client, message: Message):
     client.send_message(
         chat_id=message.chat.id,
@@ -152,7 +154,9 @@ def settings(client, message: Message):
         )
     else:
         client.send_message(
-            chat_id=message.chat.id, text=f"Ваши текущие подписки: {user_channels}"
+            chat_id=message.chat.id,
+            text=f"Ваши текущие подписки: {user_channels}",
+            reply_markup=keyboard_add_remove_channels,
         )
 
 
