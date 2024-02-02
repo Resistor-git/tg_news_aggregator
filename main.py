@@ -2,6 +2,8 @@ from pyrogram import Client
 
 from config_data.config import Config, load_config
 
+# from keyboards import create_main_menu
+
 config: Config = load_config()
 
 userbot = Client(
@@ -19,3 +21,4 @@ bot = Client(
 
 if __name__ == "__main__":
     bot.run()
+    # create_main_menu()

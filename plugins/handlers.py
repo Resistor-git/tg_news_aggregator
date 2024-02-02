@@ -7,6 +7,7 @@ from pyrogram.types import (
     Message,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
+    CallbackQuery,
 )
 
 from main import config, userbot
@@ -18,6 +19,10 @@ from helpers.helpers import (
     add_new_user_if_not_exists,
 )
 from users import users_settings
+from keyboards import (
+    keyboard_inline_change_channels,
+    keyboard_inline_add_remove_channels,
+)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -54,6 +59,10 @@ keyboard_add_remove_channels = ReplyKeyboardMarkup(
     [[button_add_channel], [button_remove_channel], [button_go_to_start]],
     resize_keyboard=True,
 )
+
+# button_inline_add_fontanka = InlineKeyboardButton(
+#     "Фонтанка", callback_data="add_fontanka"
+# )
 
 
 @Client.on_message(filters.command(["start"]) | filters.regex("Вернуться к новостям"))
@@ -166,40 +175,72 @@ def settings(client, message: Message):
         client.send_message(
             chat_id=message.chat.id,
             text=f"Ваши текущие подписки: {user_channels}",
-            reply_markup=keyboard_add_remove_channels,
+            reply_markup=keyboard_inline_add_remove_channels,
         )
 
 
-@Client.on_message(filters.command(["add_channels"]) | filters.regex("Добавить каналы"))
-def add_channels_keyboard(client, message: Message):
-    """
-    Creates keyboard with available channels.
-    Shows only channels that user is not subscribed to.
-    """
-    user_channels: list[str] | None = None
-    keyboard_add_channels: list[list[KeyboardButton]] = [[button_go_to_start]]
-    channel_to_button = {
-        "fontankaspb": button_add_fontanka,
-        "bbcrussian": button_add_bbcrussian,
-        "novaya_europe": button_add_novaya,
-        "news_sirena": button_add_sirena,
-        "agentstvonews": button_add_agentstvo,
-    }
-    with open("users/users_settings.json", "r") as f:
-        for user in users_settings:
-            if user["id"] == message.chat.id:
-                user_channels = user["channels"]
-                break
-    if user_channels:
-        for channel in user_channels:
-            keyboard_add_channels.append([channel_to_button[channel]])
-        client.send_message(
-            chat_id=message.chat.id,
-            text="Выберите каналы, которые хотите добавить",
-            reply_markup=ReplyKeyboardMarkup(
-                keyboard_add_channels, resize_keyboard=True
-            ),
-        )
+# @Client.on_message(filters.command(["add_channels"]) | filters.regex("Добавить каналы"))
+# def add_channels_keyboard(client, message: Message):
+#     """
+#     Creates keyboard with available channels.
+#     Shows only channels that user is not subscribed to.
+#     """
+#     user_channels: list[str] | None = None
+#     keyboard_add_channels: list[list[KeyboardButton]] = [[button_go_to_start]]
+#     channel_to_button = {
+#         "fontankaspb": button_add_fontanka,
+#         "bbcrussian": button_add_bbcrussian,
+#         "novaya_europe": button_add_novaya,
+#         "news_sirena": button_add_sirena,
+#         "agentstvonews": button_add_agentstvo,
+#     }
+#     with open("users/users_settings.json", "r") as f:
+#         for user in users_settings:
+#             if user["id"] == message.chat.id:
+#                 user_channels = user["channels"]
+#                 break
+#     if user_channels:
+#         for channel in user_channels:
+#             keyboard_add_channels.append([channel_to_button[channel]])
+#         client.send_message(
+#             chat_id=message.chat.id,
+#             text="Выберите каналы, которые хотите добавить",
+#             reply_markup=ReplyKeyboardMarkup(
+#                 keyboard_add_channels, resize_keyboard=True
+#             ),
+#         )
+
+
+# @Client.on_message(filters.command(["add_channels"]) | filters.regex("Добавить каналы"))
+# def add_keyboard(client, message: Message):
+#     all_channels: list[str] = config.channels
+#     user_channels: list[str] | None = None
+#     with open("users/users_settings.json", "r") as f:
+#         for user in users_settings:
+#             if user["id"] == message.chat.id:
+#                 user_channels = user["channels"]
+#                 break
+#         if user_channels:
+#
+#
+#     client.send_message(
+#         chat_id=message.chat.id,
+#         text="Выберите каналы, которые хотите добавить",
+#         reply_markup=keyboard_add_remove_channels,
+#     )
+
+
+@Client.on_callback_query(filters.regex("add_channels|remove_channels"))
+def change_channels(client, query: CallbackQuery):
+    logger.debug(query.data)
+    _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
+        query.from_user.id, query.data
+    )
+    client.send_message(
+        chat_id=query.message.chat.id,
+        text=f"Выберите каналы, которые хотите удалить",
+        reply_markup=_keyboard,
+    )
 
 
 @Client.on_message(filters.command(["help"]))
