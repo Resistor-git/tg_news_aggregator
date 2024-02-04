@@ -1,4 +1,5 @@
 import logging.handlers
+import json
 
 from pyrogram import Client, errors, filters
 from pyrogram.types import (
@@ -18,7 +19,8 @@ from helpers.helpers import (
     digest_filter,
     add_new_user_if_not_exists,
 )
-from users import users_settings
+
+# from users import users_settings
 from keyboards import (
     keyboard_inline_change_channels,
     keyboard_inline_add_remove_channels,
@@ -159,6 +161,7 @@ def settings(client, message: Message):
     add_new_user_if_not_exists(message.chat.id)
     user_channels: list[str] | None = None
     with open("users/users_settings.json", "r") as f:
+        users_settings = json.load(f)
         for user in users_settings:
             if user["id"] == message.chat.id:
                 user_channels = user["channels"]
@@ -241,6 +244,39 @@ def change_channels(client, query: CallbackQuery):
         text=f"Выберите каналы, которые хотите удалить",
         reply_markup=_keyboard,
     )
+
+
+@Client.on_callback_query(filters.regex("remove_"))
+def remove_channel(client, query: CallbackQuery):
+    logger.debug(f"{query.data} for user {query.from_user.id}")
+    _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
+        query.from_user.id, query.data
+    )
+    with open("users/users_settings.json", "r") as f:
+        users_settings: list[dict] = json.load(f)
+        users_settings_changed: bool = False
+        for user in users_settings:
+            if user["id"] == query.from_user.id:
+                user_channels = user["channels"]
+                try:
+                    user_channels.remove(query.data.replace("remove_", ""))
+                    user["channels"] = user_channels
+                    users_settings_changed = True
+                except ValueError:
+                    client.send_message(
+                        chat_id=query.message.chat.id,
+                        text=f"Вы не подписаны на {query.data.replace('remove_', '')}.",
+                        reply_markup=_keyboard,
+                    )
+                break
+    if users_settings_changed:
+        with open("users/users_settings.json", "w") as f:
+            json.dump(users_settings, f, indent=4)
+        client.send_message(
+            chat_id=query.message.chat.id,
+            text=f"Канал {query.data.replace('remove_', '')} удален из вашего списка",
+            # reply_markup=_keyboard,
+        )
 
 
 @Client.on_message(filters.command(["help"]))

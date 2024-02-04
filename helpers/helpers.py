@@ -7,7 +7,8 @@ from typing import AsyncGenerator
 from pyrogram.types import Message
 
 from main import config, userbot
-from users import users_settings
+
+# from users import users_settings
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -122,6 +123,7 @@ def add_new_user_if_not_exists(user_id: int) -> None:
     User is subscribed to all channels by default.
     """
     with open("users/users_settings.json", "r+") as f:
+        users_settings = json.load(f)
         user_exists = False
         for user in users_settings:
             if user["id"] == user_id:

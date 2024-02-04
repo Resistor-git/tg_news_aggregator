@@ -1,9 +1,11 @@
+import json
+
 from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
 )
 
-from users import users_settings
+# from users import users_settings
 
 
 button_inline_add_channels = InlineKeyboardButton(
@@ -40,12 +42,13 @@ def keyboard_inline_change_channels(user_id: int, action: str) -> InlineKeyboard
     If user wants to remove channels, returns keyboard with already added channels.
     """
     with open("users/users_settings.json", "r") as f:
-        user_channels: list[str] = []
         buttons: list[InlineKeyboardButton] = []
+        users_settings = json.load(f)
         for user in users_settings:
             if user["id"] == user_id:
                 user_channels = user["channels"]
-                if action == "remove_channels":
+                # if action == "remove_channels":
+                if "remove" in action:
                     for channel in user_channels:
                         buttons.append(
                             InlineKeyboardButton(
