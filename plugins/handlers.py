@@ -264,6 +264,13 @@ def remove_channel(client, query: CallbackQuery):
         for user in users_settings:
             if user["id"] == query.from_user.id:
                 user_channels = user["channels"]
+                if not user_channels:
+                    client.send_message(
+                        chat_id=query.message.chat.id,
+                        text=LEXICON["no_subscriptions"],
+                        reply_markup=keyboard_inline_add_remove_channels,
+                    )
+                    break
                 try:
                     user_channels.remove(query.data.replace("remove_", ""))
                     user["channels"] = user_channels
@@ -299,23 +306,61 @@ def remove_channel(client, query: CallbackQuery):
 
 @Client.on_callback_query(filters.regex("add_"))
 def add_channel(client, query: CallbackQuery):
+    """
+    Add channel to user settings using inline keyboard.
+    """
     logger.debug(f"{query.data} for user {query.from_user.id}")
     _keyboard_channels_to_add: InlineKeyboardMarkup = keyboard_inline_change_channels(
         query.from_user.id, query.data
     )
+    users_settings: list[dict] = json.load(open("users/users_settings.json"))
     users_settings_changed: bool = False
-    if _keyboard_channels_to_add:
-        client.send_message(
-            chat_id=query.message.chat.id,
-            text=LEXICON["add_channels_list"],
-            reply_markup=_keyboard_channels_to_add,
+    for user in users_settings:
+        if user["id"] == query.from_user.id:
+            user_channels = user["channels"]
+            if query.data == "add_channels":
+                if _keyboard_channels_to_add:
+                    client.send_message(
+                        chat_id=query.message.chat.id,
+                        text=f"{LEXICON['add_channels_list']}",
+                        reply_markup=_keyboard_channels_to_add,
+                    )
+                else:
+                    client.send_message(
+                        chat_id=query.message.chat.id,
+                        text=f"{LEXICON['subscribed_to_all_channels']}",
+                        reply_markup=keyboard_inline_add_remove_channels,
+                    )
+            elif query.data.replace("add_", "") not in user_channels:
+                user_channels.append(query.data.replace("add_", ""))
+                users_settings_changed = True
+            else:
+                client.send_message(
+                    chat_id=query.message.chat.id,
+                    text=f"Вы уже подписаны на {query.data.replace('add_', '')}.\n"
+                    f"{LEXICON['add_channels_list']}",
+                    reply_markup=_keyboard_channels_to_add,
+                )
+            break
+    if users_settings_changed:
+        with open("users/users_settings.json", "w") as f:
+            json.dump(users_settings, f, indent=4)
+        _keyboard_channels_to_add = keyboard_inline_change_channels(
+            query.from_user.id, query.data
         )
-    else:
-        client.send_message(
-            chat_id=query.message.chat.id,
-            text=LEXICON["subscribed_to_all_channels"],
-            reply_markup=keyboard_inline_add_remove_channels,
-        )
+        if _keyboard_channels_to_add:
+            client.send_message(
+                chat_id=query.message.chat.id,
+                text=LEXICON["add_channels_list"],
+                reply_markup=_keyboard_channels_to_add,
+            )
+        else:
+            client.send_message(
+                chat_id=query.message.chat.id,
+                text=f"Вы подписались на {query.data.replace('add_', '')}.\n"
+                f"{LEXICON['subscribed_to_all_channels']}",
+                reply_markup=keyboard_inline_add_remove_channels,
+            )
 
 
 @Client.on_message(filters.command(["help"]))
