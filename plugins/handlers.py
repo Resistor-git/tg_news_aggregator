@@ -232,24 +232,24 @@ def settings(client, message: Message):
 #     )
 
 
-@Client.on_callback_query(filters.regex("remove_channels"))
-def remove_channels(client, query: CallbackQuery):
-    logger.debug(query.data)
-    _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
-        query.from_user.id, query.data
-    )
-    if _keyboard:
-        client.send_message(
-            chat_id=query.message.chat.id,
-            text=LEXICON["delete_channels_list"],
-            reply_markup=_keyboard,
-        )
-    else:
-        client.send_message(
-            chat_id=query.message.chat.id,
-            text=LEXICON["no_subscriptions"],
-            reply_markup=keyboard_inline_add_remove_channels,
-        )
+# @Client.on_callback_query(filters.regex("remove_channels"))
+# def remove_channels(client, query: CallbackQuery):
+#     logger.debug(query.data)
+#     _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
+#         query.from_user.id, query.data
+#     )
+#     if _keyboard:
+#         client.send_message(
+#             chat_id=query.message.chat.id,
+#             text=LEXICON["delete_channels_list"],
+#             reply_markup=_keyboard,
+#         )
+#     else:
+#         client.send_message(
+#             chat_id=query.message.chat.id,
+#             text=LEXICON["no_subscriptions"],
+#             reply_markup=keyboard_inline_add_remove_channels,
+#         )
 
 
 @Client.on_callback_query(filters.regex("remove_"))
@@ -279,15 +279,15 @@ def remove_channel(client, query: CallbackQuery):
     if users_settings_changed:
         with open("users/users_settings.json", "w") as f:
             json.dump(users_settings, f, indent=4)
-        _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
-            query.from_user.id, query.data
+        _keyboard_channels_to_remove: InlineKeyboardMarkup = (
+            keyboard_inline_change_channels(query.from_user.id, query.data)
         )
-        if _keyboard:
+        if _keyboard_channels_to_remove:
             client.send_message(
                 chat_id=query.message.chat.id,
                 text=f"Канал {query.data.replace('remove_', '')} удален из вашего списка.\n"
                 f"{LEXICON['delete_channels_list']}",
-                reply_markup=_keyboard,
+                reply_markup=_keyboard_channels_to_remove,
             )
         else:
             client.send_message(
@@ -295,6 +295,27 @@ def remove_channel(client, query: CallbackQuery):
                 text=LEXICON["no_subscriptions"],
                 reply_markup=keyboard_inline_add_remove_channels,
             )
+
+
+@Client.on_callback_query(filters.regex("add_"))
+def add_channel(client, query: CallbackQuery):
+    logger.debug(f"{query.data} for user {query.from_user.id}")
+    _keyboard_channels_to_add: InlineKeyboardMarkup = keyboard_inline_change_channels(
+        query.from_user.id, query.data
+    )
+    users_settings_changed: bool = False
+    if _keyboard_channels_to_add:
+        client.send_message(
+            chat_id=query.message.chat.id,
+            text=LEXICON["add_channels_list"],
+            reply_markup=_keyboard_channels_to_add,
+        )
+    else:
+        client.send_message(
+            chat_id=query.message.chat.id,
+            text=LEXICON["subscribed_to_all_channels"],
+            reply_markup=keyboard_inline_add_remove_channels,
+        )
 
 
 @Client.on_message(filters.command(["help"]))

@@ -5,6 +5,8 @@ from pyrogram.types import (
     InlineKeyboardButton,
 )
 
+from main import config
+
 # from users import users_settings
 
 
@@ -56,6 +58,14 @@ def keyboard_inline_change_channels(
                                 text=channel, callback_data=f"remove_{channel}"
                             )
                         )
+                elif "add" in action:
+                    for channel in config.channels:
+                        if channel not in user_channels:
+                            buttons.append(
+                                InlineKeyboardButton(
+                                    text=channel, callback_data=f"add_{channel}"
+                                )
+                            )
                 break
         if buttons:
             return InlineKeyboardMarkup([[button] for button in buttons])
