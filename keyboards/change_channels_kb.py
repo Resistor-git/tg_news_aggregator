@@ -35,7 +35,9 @@ keyboard_inline_add_remove_channels = InlineKeyboardMarkup(
 )
 
 
-def keyboard_inline_change_channels(user_id: int, action: str) -> InlineKeyboardMarkup:
+def keyboard_inline_change_channels(
+    user_id: int, action: str
+) -> InlineKeyboardMarkup | None:
     """
     Creates inline keyboard with buttons for adding and removing channels.
     If user wants to add channels, returns keyboard with missing channels.
@@ -47,7 +49,6 @@ def keyboard_inline_change_channels(user_id: int, action: str) -> InlineKeyboard
         for user in users_settings:
             if user["id"] == user_id:
                 user_channels = user["channels"]
-                # if action == "remove_channels":
                 if "remove" in action:
                     for channel in user_channels:
                         buttons.append(
@@ -55,6 +56,8 @@ def keyboard_inline_change_channels(user_id: int, action: str) -> InlineKeyboard
                                 text=channel, callback_data=f"remove_{channel}"
                             )
                         )
-                    # buttons = [InlineKeyboardButton(text=..., callback_data=...) for button in user["channels"]]
                 break
-        return InlineKeyboardMarkup([[button] for button in buttons])
+        if buttons:
+            return InlineKeyboardMarkup([[button] for button in buttons])
+        return None
+        # return InlineKeyboardMarkup([[button] for button in buttons])

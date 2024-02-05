@@ -25,6 +25,7 @@ from keyboards import (
     keyboard_inline_change_channels,
     keyboard_inline_add_remove_channels,
 )
+from lexicon import LEXICON
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -54,7 +55,7 @@ button_add_bbcrussian = KeyboardButton("BBC")
 button_add_fontanka = KeyboardButton("Фонтанка")
 button_add_sirena = KeyboardButton("Сирена")
 button_add_agentstvo = KeyboardButton("Агентство")
-keyboard = ReplyKeyboardMarkup(
+keyboard_main = ReplyKeyboardMarkup(
     [[button_all_news], [button_digest]], resize_keyboard=True
 )
 keyboard_add_remove_channels = ReplyKeyboardMarkup(
@@ -72,7 +73,7 @@ def start_command(client, message: Message):
     client.send_message(
         chat_id=message.chat.id,
         text="Кнопки ниже позволяют прочитать все новости за 12 ч. или только выжимку из некоторых каналов.",
-        reply_markup=keyboard,
+        reply_markup=keyboard_main,
     )
     add_new_user_if_not_exists(message.chat.id)
 
@@ -166,13 +167,11 @@ def settings(client, message: Message):
             if user["id"] == message.chat.id:
                 user_channels = user["channels"]
                 break
-    if user_channels is None:
-        logger.warning(
-            f"User not found after calling settings().\nUser id: {message.chat.id}"
-        )
+    if not user_channels:
         client.send_message(
             chat_id=message.chat.id,
-            text=f"Ваши подписки не найдены. Пожалуйста, сообщите разработчику об этой ошибке.",
+            text=LEXICON["no_subscriptions"],
+            reply_markup=keyboard_inline_add_remove_channels,
         )
     else:
         client.send_message(
@@ -233,17 +232,24 @@ def settings(client, message: Message):
 #     )
 
 
-@Client.on_callback_query(filters.regex("add_channels|remove_channels"))
-def change_channels(client, query: CallbackQuery):
+@Client.on_callback_query(filters.regex("remove_channels"))
+def remove_channels(client, query: CallbackQuery):
     logger.debug(query.data)
     _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
         query.from_user.id, query.data
     )
-    client.send_message(
-        chat_id=query.message.chat.id,
-        text=f"Выберите каналы, которые хотите удалить",
-        reply_markup=_keyboard,
-    )
+    if _keyboard:
+        client.send_message(
+            chat_id=query.message.chat.id,
+            text=LEXICON["delete_channels_list"],
+            reply_markup=_keyboard,
+        )
+    else:
+        client.send_message(
+            chat_id=query.message.chat.id,
+            text=LEXICON["no_subscriptions"],
+            reply_markup=keyboard_inline_add_remove_channels,
+        )
 
 
 @Client.on_callback_query(filters.regex("remove_"))
@@ -265,8 +271,8 @@ def remove_channel(client, query: CallbackQuery):
                 except ValueError:
                     client.send_message(
                         chat_id=query.message.chat.id,
-                        text=f"Вы не подписаны на {query.data.replace('remove_', '')}."
-                        f"Выберите каналы, которые хотите удалить.",
+                        text=f"Вы не подписаны на {query.data.replace('remove_', '')}.\n"
+                        f"{LEXICON['delete_channels_list']}",
                         reply_markup=_keyboard,
                     )
                 break
@@ -276,12 +282,19 @@ def remove_channel(client, query: CallbackQuery):
         _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
             query.from_user.id, query.data
         )
-        client.send_message(
-            chat_id=query.message.chat.id,
-            text=f"Канал {query.data.replace('remove_', '')} удален из вашего списка.\n"
-            f"Выберите каналы, которые хотите удалить.",
-            reply_markup=_keyboard,
-        )
+        if _keyboard:
+            client.send_message(
+                chat_id=query.message.chat.id,
+                text=f"Канал {query.data.replace('remove_', '')} удален из вашего списка.\n"
+                f"{LEXICON['delete_channels_list']}",
+                reply_markup=_keyboard,
+            )
+        else:
+            client.send_message(
+                chat_id=query.message.chat.id,
+                text=LEXICON["no_subscriptions"],
+                reply_markup=keyboard_inline_add_remove_channels,
+            )
 
 
 @Client.on_message(filters.command(["help"]))

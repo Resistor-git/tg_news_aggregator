@@ -122,14 +122,16 @@ def add_new_user_if_not_exists(user_id: int) -> None:
     Adds a new user to the database (json).
     User is subscribed to all channels by default.
     """
-    with open("users/users_settings.json", "r+") as f:
+    user_exists = False
+    with open("users/users_settings.json", "r") as f:
         users_settings = json.load(f)
-        user_exists = False
         for user in users_settings:
             if user["id"] == user_id:
                 user_exists = True
                 break
-        if not user_exists:
+    if not user_exists:
+        logger.warning(f"User not found after calling settings().\nUser id: {user_id}")
+        with open("users/users_settings.json", "w") as f:
             users_settings.append({"id": user_id, "channels": config.channels})
             json.dump(users_settings, f, indent=4)
             logger.info(f"Added new user: {user_id}")
