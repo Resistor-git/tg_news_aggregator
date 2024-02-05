@@ -265,17 +265,22 @@ def remove_channel(client, query: CallbackQuery):
                 except ValueError:
                     client.send_message(
                         chat_id=query.message.chat.id,
-                        text=f"Вы не подписаны на {query.data.replace('remove_', '')}.",
+                        text=f"Вы не подписаны на {query.data.replace('remove_', '')}."
+                        f"Выберите каналы, которые хотите удалить.",
                         reply_markup=_keyboard,
                     )
                 break
     if users_settings_changed:
         with open("users/users_settings.json", "w") as f:
             json.dump(users_settings, f, indent=4)
+        _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
+            query.from_user.id, query.data
+        )
         client.send_message(
             chat_id=query.message.chat.id,
-            text=f"Канал {query.data.replace('remove_', '')} удален из вашего списка",
-            # reply_markup=_keyboard,
+            text=f"Канал {query.data.replace('remove_', '')} удален из вашего списка.\n"
+            f"Выберите каналы, которые хотите удалить.",
+            reply_markup=_keyboard,
         )
 
 
