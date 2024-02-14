@@ -16,21 +16,24 @@ button_inline_add_channels = InlineKeyboardButton(
 button_inline_remove_channels = InlineKeyboardButton(
     "Удалить каналы", callback_data="remove_channels"
 )
-button_inline_novaya_europe = InlineKeyboardButton(
-    "Новая", callback_data="add_novaya_europe"
+button_inline_go_to_settings = InlineKeyboardButton(
+    "Вернуться назад", callback_data="settings"
 )
-button_inline_add_bbcrussian = InlineKeyboardButton(
-    "BBC Russian", callback_data="add_bbcrussian"
-)
-button_inline_add_fontanka = InlineKeyboardButton(
-    "Фонтанка", callback_data="add_fontanka"
-)
-button_inline_add_news_sirena = InlineKeyboardButton(
-    "Сирена", callback_data="add_news_sirena"
-)
-button_inline_add_agentstvonews = InlineKeyboardButton(
-    "Агентство", callback_data="add_agentstvonews"
-)
+# button_inline_novaya_europe = InlineKeyboardButton(
+#     "Новая", callback_data="add_novaya_europe"
+# )
+# button_inline_add_bbcrussian = InlineKeyboardButton(
+#     "BBC Russian", callback_data="add_bbcrussian"
+# )
+# button_inline_add_fontanka = InlineKeyboardButton(
+#     "Фонтанка", callback_data="add_fontanka"
+# )
+# button_inline_add_news_sirena = InlineKeyboardButton(
+#     "Сирена", callback_data="add_news_sirena"
+# )
+# button_inline_add_agentstvonews = InlineKeyboardButton(
+#     "Агентство", callback_data="add_agentstvonews"
+# )
 
 keyboard_inline_add_remove_channels = InlineKeyboardMarkup(
     [[button_inline_add_channels], [button_inline_remove_channels]]
@@ -68,6 +71,7 @@ def keyboard_inline_change_channels(
                             )
                 break
         if buttons:
+            buttons.append(button_inline_go_to_settings)
             return InlineKeyboardMarkup([[button] for button in buttons])
         return None
         # return InlineKeyboardMarkup([[button] for button in buttons])

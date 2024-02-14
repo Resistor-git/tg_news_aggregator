@@ -46,28 +46,29 @@ logger.addHandler(stream_handler)
 
 button_all_news = KeyboardButton("Все новости за 12 часов")
 button_digest = KeyboardButton("Дайджест за 12 часов")
-button_add_channel = KeyboardButton("Добавить каналы")
-button_remove_channel = KeyboardButton("Удалить каналы")
-button_go_to_start = KeyboardButton("Вернуться к новостям")
-button_add_novaya = KeyboardButton("Новая")
-button_add_bbcrussian = KeyboardButton("BBC")
-button_add_fontanka = KeyboardButton("Фонтанка")
-button_add_sirena = KeyboardButton("Сирена")
-button_add_agentstvo = KeyboardButton("Агентство")
+# button_add_channel = KeyboardButton("Добавить каналы")
+# button_remove_channel = KeyboardButton("Удалить каналы")
+# button_go_to_start = KeyboardButton("Вернуться к новостям")
+# button_add_novaya = KeyboardButton("Новая")
+# button_add_bbcrussian = KeyboardButton("BBC")
+# button_add_fontanka = KeyboardButton("Фонтанка")
+# button_add_sirena = KeyboardButton("Сирена")
+# button_add_agentstvo = KeyboardButton("Агентство")
 keyboard_main = ReplyKeyboardMarkup(
     [[button_all_news], [button_digest]], resize_keyboard=True
 )
-keyboard_add_remove_channels = ReplyKeyboardMarkup(
-    [[button_add_channel], [button_remove_channel], [button_go_to_start]],
-    resize_keyboard=True,
-)
+# keyboard_add_remove_channels = ReplyKeyboardMarkup(
+#     [[button_add_channel], [button_remove_channel], [button_go_to_start]],
+#     resize_keyboard=True,
+# )
 
 # button_inline_add_fontanka = InlineKeyboardButton(
 #     "Фонтанка", callback_data="add_fontanka"
 # )
 
 
-@Client.on_message(filters.command(["start"]) | filters.regex("Вернуться к новостям"))
+# @Client.on_message(filters.command(["start"]) | filters.regex("Вернуться к новостям"))
+@Client.on_message(filters.command(["start"]))
 def start_command(client, message: Message):
     client.send_message(
         chat_id=message.chat.id,
@@ -178,6 +179,15 @@ def settings(client, message: Message):
             text=f"Ваши текущие подписки: {user_channels}",
             reply_markup=keyboard_inline_add_remove_channels,
         )
+
+
+@Client.on_callback_query(filters.regex("settings"))
+def call_settings(client, query):
+    """
+    Calls settings function.
+    Used to handle cases when settings are called by inline buttons.
+    """
+    settings(client, query.message)
 
 
 # @Client.on_message(filters.command(["add_channels"]) | filters.regex("Добавить каналы"))
