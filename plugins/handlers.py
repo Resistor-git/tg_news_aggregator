@@ -7,7 +7,6 @@ from pyrogram.types import (
     KeyboardButton,
     Message,
     InlineKeyboardMarkup,
-    InlineKeyboardButton,
     CallbackQuery,
 )
 
