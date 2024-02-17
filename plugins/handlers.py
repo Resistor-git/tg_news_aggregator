@@ -136,13 +136,19 @@ def digest(client, message: Message):
     Sends digest messages to the client. If there are no digests, sends informational message.
     """
     empty_digest = True
+    user_channels = get_user_subscriptions(message.from_user.id)
     if config.debug:
         client.send_message(
             chat_id=message.chat.id,
             text="В данный момент бот обновляется поэтому может выдавать неожиданные результаты или вовсе не отвечать.",
         )
     with userbot:
-        for channel in config.channels:
+        if not user_channels:
+            client.send_message(
+                chat_id=message.chat.id, text=LEXICON["no_subscriptions"]
+            )
+            return
+        for channel in user_channels:
             digests = digest_filter(get_channel_messages(channel))
             if len(digests) > 0:
                 empty_digest = False
