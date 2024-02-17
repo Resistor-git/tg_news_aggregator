@@ -137,6 +137,17 @@ def add_new_user_if_not_exists(user_id: int) -> None:
             logger.info(f"Added new user: {user_id}")
 
 
+def get_user_subscriptions(user_id: int) -> list[str]:
+    """
+    Returns user subscriptions.
+    """
+    with open("users/users_settings.json", "r") as f:
+        users_settings = json.load(f)
+        for user in users_settings:
+            if user["id"] == user_id:
+                return user["channels"]
+
+
 # def add_channel(user_id: int, channel: str,):
 #     """
 #     Adds the channel as source of news for the user.

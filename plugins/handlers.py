@@ -17,6 +17,7 @@ from helpers.helpers import (
     message_for_user,
     digest_filter,
     add_new_user_if_not_exists,
+    get_user_subscriptions,
 )
 
 # from users import users_settings
@@ -148,7 +149,7 @@ def digest(client, message: Message):
     if empty_digest:
         client.send_message(
             chat_id=message.chat.id,
-            text="К сожалению, дайджесты за последнее время не найдены. Вероятно, их ещё не опубликовали.",
+            text=LEXICON["empty_digest"],
         )
     logger.info(f"Пользователь {message.from_user.username} воспользовался дайджестом.")
 
@@ -160,13 +161,14 @@ def settings(client, message: Message):
     If user is not registered - adds new user.
     """
     add_new_user_if_not_exists(message.chat.id)
-    user_channels: list[str] | None = None
-    with open("users/users_settings.json", "r") as f:
-        users_settings = json.load(f)
-        for user in users_settings:
-            if user["id"] == message.chat.id:
-                user_channels = user["channels"]
-                break
+    # user_channels: list[str] | None = None
+    # with open("users/users_settings.json", "r") as f:
+    #     users_settings = json.load(f)
+    #     for user in users_settings:
+    #         if user["id"] == message.chat.id:
+    #             user_channels = user["channels"]
+    #             break
+    user_channels = get_user_subscriptions(message.chat.id)
     if not user_channels:
         client.send_message(
             chat_id=message.chat.id,
