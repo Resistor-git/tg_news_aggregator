@@ -84,8 +84,14 @@ def start_command(client, message: Message):
 )
 def all_news(client, message: Message):
     news: str = ""
+    user_channels = get_user_subscriptions(message.from_user.id)
     with userbot:
-        for channel in config.channels:
+        if not user_channels:
+            client.send_message(
+                chat_id=message.chat.id, text=LEXICON["no_subscriptions"]
+            )
+            return
+        for channel in user_channels:
             news += f"{message_for_user(get_headers_from_messages(get_channel_messages(channel)))}\n"
     if config.debug:
         logger.debug("DEBUG MODE")
@@ -161,14 +167,7 @@ def settings(client, message: Message):
     If user is not registered - adds new user.
     """
     add_new_user_if_not_exists(message.chat.id)
-    # user_channels: list[str] | None = None
-    # with open("users/users_settings.json", "r") as f:
-    #     users_settings = json.load(f)
-    #     for user in users_settings:
-    #         if user["id"] == message.chat.id:
-    #             user_channels = user["channels"]
-    #             break
-    user_channels = get_user_subscriptions(message.chat.id)
+    user_channels: list[str] | None = get_user_subscriptions(message.chat.id)
     if not user_channels:
         client.send_message(
             chat_id=message.chat.id,
@@ -265,6 +264,9 @@ def call_settings(client, query):
 
 @Client.on_callback_query(filters.regex("remove_"))
 def remove_channel(client, query: CallbackQuery):
+    """
+    Remove channel from user settings using inline keyboard.
+    """
     logger.debug(f"{query.data} for user {query.from_user.id}")
     _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
         query.from_user.id, query.data

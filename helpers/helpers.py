@@ -34,7 +34,7 @@ CHANNELS_WITH_CAPTIONS = ("news_sirena", "fontankaspb")
 
 def get_channel_messages(channel_name: str) -> list[Message]:
     """
-    Gets messages from channels for the period of time.
+    Gets messages from the channel for the period of time.
     Some messages contain useful info in message.text, others in message.caption
     """
     time_of_oldest_message: datetime = datetime.now() - timedelta(
