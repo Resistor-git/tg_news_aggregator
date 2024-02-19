@@ -7,3 +7,12 @@ LEXICON: dict[str, str] = {
     "subscribed_to_all_channels": "Вы подписаны на все доступные каналы.",
     "empty_digest": "К сожалению, дайджесты за последнее время не найдены. Вероятно, их ещё не опубликовали.",
 }
+
+
+CHANNELS_HUMAN_READABLE: dict[str, str] = {
+    "novaya_europe": "Новая Европа",
+    "bbcrussian": "BBC",
+    "fontankaspb": "Фонтанка",
+    "news_sirena": "Сирена",
+    "agentstvonews": "Агентство",
+}

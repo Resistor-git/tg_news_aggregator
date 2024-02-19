@@ -8,6 +8,7 @@ from pyrogram.types import (
 from main import config
 
 # from users import users_settings
+from lexicon import CHANNELS_HUMAN_READABLE
 
 
 button_inline_add_channels = InlineKeyboardButton(
@@ -58,7 +59,8 @@ def keyboard_inline_change_channels(
                     for channel in user_channels:
                         buttons.append(
                             InlineKeyboardButton(
-                                text=channel, callback_data=f"remove_{channel}"
+                                text=CHANNELS_HUMAN_READABLE[channel],
+                                callback_data=f"remove_{channel}",
                             )
                         )
                 elif "add" in action:
@@ -66,7 +68,8 @@ def keyboard_inline_change_channels(
                         if channel not in user_channels:
                             buttons.append(
                                 InlineKeyboardButton(
-                                    text=channel, callback_data=f"add_{channel}"
+                                    text=CHANNELS_HUMAN_READABLE[channel],
+                                    callback_data=f"add_{channel}",
                                 )
                             )
                 break

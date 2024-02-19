@@ -1,1 +1,1 @@
-from .lexicon import LEXICON
+from .lexicon import LEXICON, CHANNELS_HUMAN_READABLE

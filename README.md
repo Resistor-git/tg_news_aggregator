@@ -10,7 +10,7 @@ To check how it works just try it yourself https://t.me/news_custom_aggregator_b
 ## How to start
 - Create and fill in `.env` in the root folder of the project (folder with `main.py` and `.env.example`).
 - Run main.py
-- Terminal will ask you for bot token and phone number. Provide this information. For details see "Sessions" below.\
+- Terminal will ask you for bot token and phone number. Provide this information. For details see "Sessions" below.
 
 **Important**. Telegram custom news aggregator uses "Bot API" and "Telegram API", bot and userbot accordingly. Which means you need to have a bot and a telegram account.
 
@@ -22,7 +22,7 @@ In order to use a bot you need to provide some credentials. Pyrogram uses sessio
 - Launch bot again.
 - Ask bot for digest or headers.
 - Enter phone and confirmation code for userbot.
-- If you use remote server: copy my_bot.session and my_userbot.session into the folder of your project on the remote server (for example: scp my_userbot.session username@111.111.111.111:~/tg_news_aggregator)
+- If you use remote server: copy my_bot.session and my_userbot.session into the folder of your project on the remote server (for example: scp my_bot.session username@111.111.111.111:~/tg_news_aggregator)
 
 How to obtain api_id: https://core.telegram.org/api/obtaining_api_id \
 How to obtain bot token: https://core.telegram.org/bots/tutorial#obtain-your-bot-token
