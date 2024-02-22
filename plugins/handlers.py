@@ -25,7 +25,7 @@ from keyboards import (
     keyboard_inline_change_channels,
     keyboard_inline_add_remove_channels,
 )
-from lexicon import LEXICON
+from lexicon import LEXICON, CHANNELS_HUMAN_READABLE
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -183,7 +183,7 @@ def settings(client, message: Message):
     else:
         client.send_message(
             chat_id=message.chat.id,
-            text=f"Ваши текущие подписки: {user_channels}",
+            text=f"Ваши текущие подписки: {', '.join([CHANNELS_HUMAN_READABLE[channel] for channel in user_channels])}.",
             reply_markup=keyboard_inline_add_remove_channels,
         )
 
