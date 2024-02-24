@@ -20,7 +20,6 @@ from helpers.helpers import (
     get_user_subscriptions,
 )
 
-# from users import users_settings
 from keyboards import (
     keyboard_inline_change_channels,
     keyboard_inline_add_remove_channels,
@@ -47,12 +46,17 @@ logger.addHandler(stream_handler)
 button_all_news = KeyboardButton("Все новости за 12 часов")
 button_digest = KeyboardButton("Дайджест за 12 часов")
 keyboard_main = ReplyKeyboardMarkup(
-    [[button_all_news], [button_digest]], resize_keyboard=True
+    [[button_all_news, button_digest]],
+    resize_keyboard=True,
 )
 
 
 @Client.on_message(filters.command(["start"]))
 def start_command(client, message: Message):
+    """
+    Creates new user if user does not exist.
+    Creates the keyboard to get news.
+    """
     client.send_message(
         chat_id=message.chat.id,
         text="Кнопки ниже позволяют прочитать все новости за 12 ч. или только выжимку из некоторых каналов.",
@@ -65,6 +69,10 @@ def start_command(client, message: Message):
     filters.command(["all_news"]) | filters.regex("Все новости за 12 часов")
 )
 def all_news(client, message: Message):
+    """
+    Get headers of all news for the specified period (default is 12 hours).
+    Only news from subscriptions are included.
+    """
     news: str = ""
     user_channels = get_user_subscriptions(message.from_user.id)
     with userbot:
@@ -116,6 +124,7 @@ def all_news(client, message: Message):
 def digest(client, message: Message):
     """
     Sends digest messages to the client. If there are no digests, sends informational message.
+    Only news from subscriptions are included.
     """
     empty_digest = True
     user_channels = get_user_subscriptions(message.from_user.id)
