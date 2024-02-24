@@ -77,4 +77,3 @@ def keyboard_inline_change_channels(
             buttons.append(button_inline_go_to_settings)
             return InlineKeyboardMarkup([[button] for button in buttons])
         return None
-        # return InlineKeyboardMarkup([[button] for button in buttons])

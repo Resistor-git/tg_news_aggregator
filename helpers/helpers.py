@@ -100,7 +100,8 @@ def digest_filter(messages: list[Message]) -> list[Message]:
         r"|Что случилось за"
         r"|#Что_происходит"
         r"|Главное за день"
-        r"|Главные события дня",
+        r"|Главные события дня"
+        r"|дайджест",
         flags=re.IGNORECASE,
     )
     _digest_channels_with_text: tuple[str, ...] = ("novaya_europe", "fontankaspb")

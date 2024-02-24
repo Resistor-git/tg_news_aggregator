@@ -44,31 +44,13 @@ stream_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
-
 button_all_news = KeyboardButton("Все новости за 12 часов")
 button_digest = KeyboardButton("Дайджест за 12 часов")
-# button_add_channel = KeyboardButton("Добавить каналы")
-# button_remove_channel = KeyboardButton("Удалить каналы")
-# button_go_to_start = KeyboardButton("Вернуться к новостям")
-# button_add_novaya = KeyboardButton("Новая")
-# button_add_bbcrussian = KeyboardButton("BBC")
-# button_add_fontanka = KeyboardButton("Фонтанка")
-# button_add_sirena = KeyboardButton("Сирена")
-# button_add_agentstvo = KeyboardButton("Агентство")
 keyboard_main = ReplyKeyboardMarkup(
     [[button_all_news], [button_digest]], resize_keyboard=True
 )
-# keyboard_add_remove_channels = ReplyKeyboardMarkup(
-#     [[button_add_channel], [button_remove_channel], [button_go_to_start]],
-#     resize_keyboard=True,
-# )
-
-# button_inline_add_fontanka = InlineKeyboardButton(
-#     "Фонтанка", callback_data="add_fontanka"
-# )
 
 
-# @Client.on_message(filters.command(["start"]) | filters.regex("Вернуться к новостям"))
 @Client.on_message(filters.command(["start"]))
 def start_command(client, message: Message):
     client.send_message(
@@ -197,77 +179,6 @@ def call_settings(client, query):
     settings(client, query.message)
 
 
-# @Client.on_message(filters.command(["add_channels"]) | filters.regex("Добавить каналы"))
-# def add_channels_keyboard(client, message: Message):
-#     """
-#     Creates keyboard with available channels.
-#     Shows only channels that user is not subscribed to.
-#     """
-#     user_channels: list[str] | None = None
-#     keyboard_add_channels: list[list[KeyboardButton]] = [[button_go_to_start]]
-#     channel_to_button = {
-#         "fontankaspb": button_add_fontanka,
-#         "bbcrussian": button_add_bbcrussian,
-#         "novaya_europe": button_add_novaya,
-#         "news_sirena": button_add_sirena,
-#         "agentstvonews": button_add_agentstvo,
-#     }
-#     with open("users/users_settings.json", "r") as f:
-#         for user in users_settings:
-#             if user["id"] == message.chat.id:
-#                 user_channels = user["channels"]
-#                 break
-#     if user_channels:
-#         for channel in user_channels:
-#             keyboard_add_channels.append([channel_to_button[channel]])
-#         client.send_message(
-#             chat_id=message.chat.id,
-#             text="Выберите каналы, которые хотите добавить",
-#             reply_markup=ReplyKeyboardMarkup(
-#                 keyboard_add_channels, resize_keyboard=True
-#             ),
-#         )
-
-
-# @Client.on_message(filters.command(["add_channels"]) | filters.regex("Добавить каналы"))
-# def add_keyboard(client, message: Message):
-#     all_channels: list[str] = config.channels
-#     user_channels: list[str] | None = None
-#     with open("users/users_settings.json", "r") as f:
-#         for user in users_settings:
-#             if user["id"] == message.chat.id:
-#                 user_channels = user["channels"]
-#                 break
-#         if user_channels:
-#
-#
-#     client.send_message(
-#         chat_id=message.chat.id,
-#         text="Выберите каналы, которые хотите добавить",
-#         reply_markup=keyboard_add_remove_channels,
-#     )
-
-
-# @Client.on_callback_query(filters.regex("remove_channels"))
-# def remove_channels(client, query: CallbackQuery):
-#     logger.debug(query.data)
-#     _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
-#         query.from_user.id, query.data
-#     )
-#     if _keyboard:
-#         client.send_message(
-#             chat_id=query.message.chat.id,
-#             text=LEXICON["delete_channels_list"],
-#             reply_markup=_keyboard,
-#         )
-#     else:
-#         client.send_message(
-#             chat_id=query.message.chat.id,
-#             text=LEXICON["no_subscriptions"],
-#             reply_markup=keyboard_inline_add_remove_channels,
-#         )
-
-
 @Client.on_callback_query(filters.regex("remove_"))
 def remove_channel(client, query: CallbackQuery):
     """
@@ -311,7 +222,7 @@ def remove_channel(client, query: CallbackQuery):
         if _keyboard_channels_to_remove:
             client.send_message(
                 chat_id=query.message.chat.id,
-                text=f"Канал {query.data.replace('remove_', '')} удален из вашего списка.\n"
+                text=f"Канал {query.data.replace('remove_', '')} удалён из вашего списка.\n"
                 f"{LEXICON['delete_channels_list']}",
                 reply_markup=_keyboard_channels_to_remove,
             )
@@ -370,7 +281,8 @@ def add_channel(client, query: CallbackQuery):
         if _keyboard_channels_to_add:
             client.send_message(
                 chat_id=query.message.chat.id,
-                text=LEXICON["add_channels_list"],
+                text=f"Вы подписались на {query.data.replace('add_', '')}.\n"
+                f"{LEXICON['add_channels_list']}",
                 reply_markup=_keyboard_channels_to_add,
             )
         else:
