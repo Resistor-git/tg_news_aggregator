@@ -165,7 +165,8 @@ def settings(client, message: Message):
     else:
         client.send_message(
             chat_id=message.chat.id,
-            text=f"Ваши текущие подписки: {', '.join([CHANNELS_HUMAN_READABLE[channel] for channel in user_channels])}.",
+            text=f"Ваши текущие подписки: "
+            f"{', '.join([CHANNELS_HUMAN_READABLE[channel] for channel in user_channels])}.",
             reply_markup=keyboard_inline_add_remove_channels,
         )
 
@@ -208,8 +209,7 @@ def remove_channel(client, query: CallbackQuery):
                 except ValueError:
                     client.send_message(
                         chat_id=query.message.chat.id,
-                        text=f"Вы не подписаны на {query.data.replace('remove_', '')}.\n"
-                        f"{LEXICON['delete_channels_list']}",
+                        text=f"{LEXICON['delete_channels_list']}",
                         reply_markup=_keyboard,
                     )
                 break
@@ -222,7 +222,8 @@ def remove_channel(client, query: CallbackQuery):
         if _keyboard_channels_to_remove:
             client.send_message(
                 chat_id=query.message.chat.id,
-                text=f"Канал {query.data.replace('remove_', '')} удалён из вашего списка.\n"
+                text=f"Канал {CHANNELS_HUMAN_READABLE[query.data.replace('remove_', '')]} "
+                f"удалён из вашего списка.\n"
                 f"{LEXICON['delete_channels_list']}",
                 reply_markup=_keyboard_channels_to_remove,
             )
@@ -267,7 +268,7 @@ def add_channel(client, query: CallbackQuery):
             else:
                 client.send_message(
                     chat_id=query.message.chat.id,
-                    text=f"Вы уже подписаны на {query.data.replace('add_', '')}.\n"
+                    text=f"Вы уже подписаны на {CHANNELS_HUMAN_READABLE[query.data.replace('add_', '')]}.\n"
                     f"{LEXICON['add_channels_list']}",
                     reply_markup=_keyboard_channels_to_add,
                 )
@@ -281,14 +282,14 @@ def add_channel(client, query: CallbackQuery):
         if _keyboard_channels_to_add:
             client.send_message(
                 chat_id=query.message.chat.id,
-                text=f"Вы подписались на {query.data.replace('add_', '')}.\n"
+                text=f"Вы подписались на {CHANNELS_HUMAN_READABLE[query.data.replace('add_', '')]}.\n"
                 f"{LEXICON['add_channels_list']}",
                 reply_markup=_keyboard_channels_to_add,
             )
         else:
             client.send_message(
                 chat_id=query.message.chat.id,
-                text=f"Вы подписались на {query.data.replace('add_', '')}.\n"
+                text=f"Вы подписались на {CHANNELS_HUMAN_READABLE[query.data.replace('add_', '')]}.\n"
                 f"{LEXICON['subscribed_to_all_channels']}",
                 reply_markup=keyboard_inline_add_remove_channels,
             )
