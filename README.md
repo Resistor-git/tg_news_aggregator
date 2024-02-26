@@ -9,7 +9,7 @@ To check how it works just try it yourself https://t.me/news_custom_aggregator_b
 
 ## How to start
 - Create and fill in `.env` in the root folder of the project (folder with `main.py` and `.env.example`).
-- Create `user_settings.json` in the `users` folder. It is advised to just rename the `users_settings.json.example`.
+- Create `user_settings.json` in the `users` folder. It is advised to copy data from `users_settings.json.example`.
 - Run main.py
 - Terminal will ask you for bot token and phone number. Provide this information. For details see "Sessions" below.
 
@@ -67,7 +67,6 @@ Be aware, that workflow launches `docker system prune -f` after deployment. You 
 
 ## How to deploy to the remote server
 - Copy my_bot.session and my_userbot.session (see details in "Sessions").
-- Copy `docker-compose-production.yaml`.
 - Create folder `users` with file `user_settings.json`.
 - To start the container run the following commands in your server terminal:
 ```
