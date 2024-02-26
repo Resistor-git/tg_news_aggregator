@@ -23,7 +23,7 @@ In order to use a bot you need to provide some credentials. Pyrogram uses sessio
 - Launch bot again.
 - Ask bot for digest or headers.
 - Enter phone and confirmation code for userbot.
-- If you use remote server: copy my_bot.session and my_userbot.session into the folder of your project on the remote server (for example: scp my_bot.session username@111.111.111.111:~/tg_news_aggregator)
+- If you use remote server: copy `my_bot.session` and `my_userbot.session` into the folder of your project on the remote server (for example: scp my_bot.session username@111.111.111.111:~/tg_news_aggregator)
 
 How to obtain api_id: https://core.telegram.org/api/obtaining_api_id \
 How to obtain bot token: https://core.telegram.org/bots/tutorial#obtain-your-bot-token
@@ -64,3 +64,17 @@ All subscriptions are stored in the `users\user_settings.json`. The file has the
 ## GitHub Workflow
 Workflow checks that code is formatted according to the black standard. Remove job 'linter' from the workflow if you use another standard.\
 Be aware, that workflow launches `docker system prune -f` after deployment. You may consider to remove this line.
+
+## How to deploy to the remote server
+- Copy my_bot.session and my_userbot.session (see details in "Sessions").
+- Copy `docker-compose-production.yaml`.
+- Create folder `users` with file `user_settings.json`.
+- To start the container run the following commands in your server terminal:
+```
+sudo docker compose -f docker-compose-production.yaml pull
+sudo docker compose -f docker-compose-production.yaml down
+sudo docker compose -f docker-compose-production.yaml up -d
+```
+
+## Author
+[Resistor](https://github.com/Resistor-git/)

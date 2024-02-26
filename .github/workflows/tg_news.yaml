@@ -3,7 +3,7 @@ name: tg news aggregator workflow
 on:
   push:
     branches:
-      - main
+      - feature/user-specific-channels-inline-buttons  # change to "main" after merging with main
 
 jobs:
   linter:

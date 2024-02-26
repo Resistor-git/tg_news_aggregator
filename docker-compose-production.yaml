@@ -10,3 +10,4 @@ services:
       - ./my_bot.session:/app/my_bot.session
       - ./my_userbot.session:/app/my_userbot.session
       - ./logs:/app/logs
+      - ./users/users_settings.json:/app/users/users_settings.json
