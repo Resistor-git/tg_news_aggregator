@@ -9,6 +9,7 @@ To check how it works just try it yourself https://t.me/news_custom_aggregator_b
 
 ## How to start
 - Create and fill in `.env` in the root folder of the project (folder with `main.py` and `.env.example`).
+- Create `user_settings.json` in the `users` folder. It is advised to just rename the `users_settings.json.example`.
 - Run main.py
 - Terminal will ask you for bot token and phone number. Provide this information. For details see "Sessions" below.
 
@@ -37,6 +38,28 @@ How to obtain bot token: https://core.telegram.org/bots/tutorial#obtain-your-bot
 - `MESSAGES_PER_CHANNEL_LIMIT` - amount of messages which userbot will read from one telegram channel; recommended values are from 50 to 100.
 - `ADMIN_CHAT_ID` - optional, sends the message to the according chat if there is some error or other administrative issue; default value is empty (literally, nothing after `=`).
 - `DEBUG` - used in code to trigger debug mode; default value is False.
+
+
+## Users settings
+Each user may subscribe or unsubscribe from any channel available in the `.env` file (field `CHANNELS`).
+All subscriptions are stored in the `users\user_settings.json`. The file has the following structure:
+```
+[
+    {
+        "id": "0000000",  # telegram id of the user
+        "channels": [     # subscriptions of the user
+            "bbcrussian",
+            "fontankaspb"
+        ]
+    },
+    {
+        "id": "1111111",
+        "channels": [
+            "fontankaspb"
+        ]
+    },
+]
+```
 
 ## GitHub Workflow
 Workflow checks that code is formatted according to the black standard. Remove job 'linter' from the workflow if you use another standard.\
