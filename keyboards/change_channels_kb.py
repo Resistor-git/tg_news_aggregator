@@ -5,7 +5,7 @@ from pyrogram.types import (
     InlineKeyboardButton,
 )
 
-from main import config
+from main import config, users_settings_path
 
 # from users import users_settings
 from lexicon import CHANNELS_HUMAN_READABLE
@@ -20,22 +20,6 @@ button_inline_remove_channels = InlineKeyboardButton(
 button_inline_go_to_settings = InlineKeyboardButton(
     "Вернуться назад", callback_data="settings"
 )
-# button_inline_novaya_europe = InlineKeyboardButton(
-#     "Новая", callback_data="add_novaya_europe"
-# )
-# button_inline_add_bbcrussian = InlineKeyboardButton(
-#     "BBC Russian", callback_data="add_bbcrussian"
-# )
-# button_inline_add_fontanka = InlineKeyboardButton(
-#     "Фонтанка", callback_data="add_fontanka"
-# )
-# button_inline_add_news_sirena = InlineKeyboardButton(
-#     "Сирена", callback_data="add_news_sirena"
-# )
-# button_inline_add_agentstvonews = InlineKeyboardButton(
-#     "Агентство", callback_data="add_agentstvonews"
-# )
-
 keyboard_inline_add_remove_channels = InlineKeyboardMarkup(
     [[button_inline_add_channels], [button_inline_remove_channels]]
 )
@@ -49,7 +33,7 @@ def keyboard_inline_change_channels(
     If user wants to add channels, returns keyboard with missing channels.
     If user wants to remove channels, returns keyboard with already added channels.
     """
-    with open("users/users_settings.json", "r") as f:
+    with open(users_settings_path, "r") as f:
         buttons: list[InlineKeyboardButton] = []
         users_settings = json.load(f)
         for user in users_settings:

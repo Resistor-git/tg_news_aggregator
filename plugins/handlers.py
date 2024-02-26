@@ -10,7 +10,7 @@ from pyrogram.types import (
     CallbackQuery,
 )
 
-from main import config, userbot
+from main import config, userbot, users_settings_path
 from helpers.helpers import (
     get_channel_messages,
     get_headers_from_messages,
@@ -106,13 +106,16 @@ def all_news(client, message: Message):
             end += config.max_message_length
     except errors.MessageEmpty:
         client.send_message(
-            chat_id=message.chat.id, text="Извините, что-то пошло не так."
+            chat_id=message.chat.id,
+            text="Извините, что-то пошло не так. Создателю бота направлено сообщение с информацией об ошибке."
+            "Пожалуйста, сообщите о случившемся разработчику.",
         )
         if config.admin_chat_id:
             client.send_message(
                 chat_id=config.admin_chat_id,
-                text=f"Возникла ошибка: MessageEmpty"
-                f"Запрос пользователя:"
+                text=f"Возникла ошибка: MessageEmpty\n"
+                f"Пользователь: {message.from_user.username}\n"
+                f"Запрос пользователя:\n"
                 f"{message}",
             )
     logger.info(
@@ -198,7 +201,7 @@ def remove_channel(client, query: CallbackQuery):
     _keyboard: InlineKeyboardMarkup = keyboard_inline_change_channels(
         query.from_user.id, query.data
     )
-    with open("users/users_settings.json", "r") as f:
+    with open(users_settings_path, "r") as f:
         users_settings: list[dict] = json.load(f)
         users_settings_changed: bool = False
         for user in users_settings:
@@ -223,7 +226,7 @@ def remove_channel(client, query: CallbackQuery):
                     )
                 break
     if users_settings_changed:
-        with open("users/users_settings.json", "w") as f:
+        with open(users_settings_path, "w") as f:
             json.dump(users_settings, f, indent=4)
         _keyboard_channels_to_remove: InlineKeyboardMarkup = (
             keyboard_inline_change_channels(query.from_user.id, query.data)
@@ -253,7 +256,7 @@ def add_channel(client, query: CallbackQuery):
     _keyboard_channels_to_add: InlineKeyboardMarkup = keyboard_inline_change_channels(
         query.from_user.id, query.data
     )
-    users_settings: list[dict] = json.load(open("users/users_settings.json"))
+    users_settings: list[dict] = json.load(open(users_settings_path))
     users_settings_changed: bool = False
     for user in users_settings:
         if user["id"] == query.from_user.id:
@@ -283,7 +286,7 @@ def add_channel(client, query: CallbackQuery):
                 )
             break
     if users_settings_changed:
-        with open("users/users_settings.json", "w") as f:
+        with open(users_settings_path, "w") as f:
             json.dump(users_settings, f, indent=4)
         _keyboard_channels_to_add = keyboard_inline_change_channels(
             query.from_user.id, query.data

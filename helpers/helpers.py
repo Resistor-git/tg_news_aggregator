@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 
 from pyrogram.types import Message
 
-from main import config, userbot
+from main import config, userbot, users_settings_path
 
 # from users import users_settings
 
@@ -125,7 +125,7 @@ def add_new_user_if_not_exists(user_id: int) -> None:
     User is subscribed to all channels by default.
     """
     user_exists = False
-    with open("users/users_settings.json", "r") as f:
+    with open(users_settings_path, "r") as f:
         users_settings = json.load(f)
         for user in users_settings:
             if user["id"] == user_id:
@@ -133,7 +133,7 @@ def add_new_user_if_not_exists(user_id: int) -> None:
                 break
     if not user_exists:
         logger.warning(f"User not found after calling settings().\nUser id: {user_id}")
-        with open("users/users_settings.json", "w") as f:
+        with open(users_settings_path, "w") as f:
             users_settings.append({"id": user_id, "channels": config.channels})
             json.dump(users_settings, f, indent=4)
             logger.info(f"Added new user: {user_id}")
@@ -143,7 +143,7 @@ def get_user_subscriptions(user_id: int) -> list[str]:
     """
     Returns user subscriptions.
     """
-    with open("users/users_settings.json", "r") as f:
+    with open(users_settings_path, "r") as f:
         users_settings = json.load(f)
         for user in users_settings:
             if user["id"] == user_id:
