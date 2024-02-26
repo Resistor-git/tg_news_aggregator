@@ -8,8 +8,6 @@ from pyrogram.types import Message
 
 from main import config, userbot, users_settings_path
 
-# from users import users_settings
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -148,19 +146,3 @@ def get_user_subscriptions(user_id: int) -> list[str]:
         for user in users_settings:
             if user["id"] == user_id:
                 return user["channels"]
-
-
-# def add_channel(user_id: int, channel: str,):
-#     """
-#     Adds the channel as source of news for the user.
-#     """
-#     with open("users_settings.json", "r+") as f:
-#         user_exists = False
-#         for user in users_settings:
-#             if user["id"] == user_id:
-#                 user_exists = True
-#                 break
-#         if not user_exists:
-#             users_settings.append({"id": user_id, "channels": [channel]})
-#             json.dump(users_settings, f, indent=4)
-#             logger.info(f"Added new user: {user_id} with channel: {[channel]}")

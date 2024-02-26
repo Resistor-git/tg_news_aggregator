@@ -107,7 +107,7 @@ def all_news(client, message: Message):
     except errors.MessageEmpty:
         client.send_message(
             chat_id=message.chat.id,
-            text="Извините, что-то пошло не так. Создателю бота направлено сообщение с информацией об ошибке."
+            text="Извините, что-то пошло не так. Создателю бота направлено сообщение с информацией об ошибке.\n"
             "Пожалуйста, сообщите о случившемся разработчику.",
         )
         if config.admin_chat_id:

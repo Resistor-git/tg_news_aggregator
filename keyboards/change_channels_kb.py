@@ -6,10 +6,7 @@ from pyrogram.types import (
 )
 
 from main import config, users_settings_path
-
-# from users import users_settings
 from lexicon import CHANNELS_HUMAN_READABLE
-
 
 button_inline_add_channels = InlineKeyboardButton(
     "Добавить каналы", callback_data="add_channels"
