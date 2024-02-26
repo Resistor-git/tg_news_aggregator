@@ -1,11 +1,12 @@
 import logging.handlers
+import json
 import re
 from datetime import datetime, timedelta
 from typing import AsyncGenerator
 
 from pyrogram.types import Message
 
-from main import config, userbot
+from main import config, userbot, users_settings_path
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -31,7 +32,7 @@ CHANNELS_WITH_CAPTIONS = ("news_sirena", "fontankaspb")
 
 def get_channel_messages(channel_name: str) -> list[Message]:
     """
-    Gets messages from channels for the period of time.
+    Gets messages from the channel for the period of time.
     Some messages contain useful info in message.text, others in message.caption
     """
     time_of_oldest_message: datetime = datetime.now() - timedelta(
@@ -97,7 +98,8 @@ def digest_filter(messages: list[Message]) -> list[Message]:
         r"|Что случилось за"
         r"|#Что_происходит"
         r"|Главное за день"
-        r"|Главные события дня",
+        r"|Главные события дня"
+        r"|дайджест",
         flags=re.IGNORECASE,
     )
     _digest_channels_with_text: tuple[str, ...] = ("novaya_europe", "fontankaspb")
@@ -113,3 +115,34 @@ def digest_filter(messages: list[Message]) -> list[Message]:
             if _keywords.search(message.caption):
                 digests.append(message)
     return digests
+
+
+def add_new_user_if_not_exists(user_id: int) -> None:
+    """
+    Adds a new user to the database (json).
+    User is subscribed to all channels by default.
+    """
+    user_exists = False
+    with open(users_settings_path, "r") as f:
+        users_settings = json.load(f)
+        for user in users_settings:
+            if user["id"] == user_id:
+                user_exists = True
+                break
+    if not user_exists:
+        logger.warning(f"User not found after calling settings().\nUser id: {user_id}")
+        with open(users_settings_path, "w") as f:
+            users_settings.append({"id": user_id, "channels": config.channels})
+            json.dump(users_settings, f, indent=4)
+            logger.info(f"Added new user: {user_id}")
+
+
+def get_user_subscriptions(user_id: int) -> list[str]:
+    """
+    Returns user subscriptions.
+    """
+    with open(users_settings_path, "r") as f:
+        users_settings = json.load(f)
+        for user in users_settings:
+            if user["id"] == user_id:
+                return user["channels"]

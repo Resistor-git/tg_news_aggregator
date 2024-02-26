@@ -1,8 +1,11 @@
+from pathlib import Path
+
 from pyrogram import Client
 
 from config_data.config import Config, load_config
 
 config: Config = load_config()
+users_settings_path: Path = Path.cwd() / "users" / "users_settings.json"
 
 userbot = Client(
     "my_userbot", config.tg_userbot.api_id, config.tg_userbot.api_hash, no_updates=True
