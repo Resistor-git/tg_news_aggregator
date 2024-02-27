@@ -1,11 +1,15 @@
 # Telegram custom news aggregator
-## version 1.0
-Provides the headlines or digests of chosen telegram channels for the period of time.
+
+## version history
+v 1.0: Provides the headlines or digests of chosen telegram channels for the period of time.\
+v 1.1: User can subscribe or unsubscribe from specific channels.
 
 ## Bot in action
 To check how it works just try it yourself https://t.me/news_custom_aggregator_bot
 - Press start or send a message `/start`
 - Use the buttons or keyboard to get news or digests from different sources.
+- Use `/settings` to check and change subscriptions.
+- Use `/help` to get additional information.
 
 ## How to start
 - Create and fill in `.env` in the root folder of the project (folder with `main.py` and `.env.example`).
@@ -74,6 +78,10 @@ sudo docker compose -f docker-compose-production.yaml pull
 sudo docker compose -f docker-compose-production.yaml down
 sudo docker compose -f docker-compose-production.yaml up -d
 ```
+
+## Tech stack
+[Python 3.12](https://www.python.org/)
+[Pyrogram 2.0](https://docs.pyrogram.org/)
 
 ## Author
 [Resistor](https://github.com/Resistor-git/)

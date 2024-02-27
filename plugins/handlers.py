@@ -311,9 +311,12 @@ def add_channel(client, query: CallbackQuery):
 def help_command(client, message: Message):
     client.send_message(
         chat_id=message.chat.id,
-        text="/start - Начать работу с ботом (обновить кнопки)\n"
+        text="Доступные команды:\n"
+        "/start - Начать работу с ботом (обновить кнопки)\n"
         "/all_news - Все новости за 12 часов\n"
         "/digest - Дайджест за 12 часов из избранных источников\n"
         "/settings - Управление подписками\n"
-        "/help - Справка/помощь",
+        "/help - Справка/помощь\n"
+        "\n"
+        "Если у вас пропали кнопки для получения новостей, напечатайте /start или выберите /start в меню ",
     )
