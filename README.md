@@ -1,6 +1,6 @@
 # Telegram custom news aggregator
 
-## version history
+## Version history
 v 1.0: Provides the headlines or digests of chosen telegram channels for the period of time.\
 v 1.1: User can subscribe or unsubscribe from specific channels.
 
@@ -80,7 +80,7 @@ sudo docker compose -f docker-compose-production.yaml up -d
 ```
 
 ## Tech stack
-[Python 3.12](https://www.python.org/)
+[Python 3.12](https://www.python.org/) \
 [Pyrogram 2.0](https://docs.pyrogram.org/)
 
 ## Author
