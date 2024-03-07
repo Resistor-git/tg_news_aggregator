@@ -15,5 +15,6 @@ CHANNELS_HUMAN_READABLE: dict[str, str] = {
     "fontankaspb": "Фонтанка",
     "news_sirena": "Сирена",
     "agentstvonews": "Агентство",
+    "echoonline_news": "Эхо",
     "nplusone": "N+1",
 }
