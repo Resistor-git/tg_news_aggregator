@@ -61,11 +61,11 @@ def get_headers_from_messages(messages: list[Message]) -> list[tuple[str, str]]:
     """
     headers: list[tuple[str, str]] = []
     for message in messages:
-        if message.sender_chat.username in CHANNELS_WITH_TEXT and message.text:
+        if message.text:
             news_message = message.text.split("\n")[0]
             news_link = message.link
             headers.append((news_message, news_link))
-        elif message.sender_chat.username in CHANNELS_WITH_CAPTIONS and message.caption:
+        elif message.caption:
             news_message = message.caption.split("\n")[0]
             news_link = message.link
             headers.append((news_message, news_link))

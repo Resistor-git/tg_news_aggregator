@@ -3,7 +3,7 @@ name: tg news aggregator workflow
 on:
   push:
     branches:
-      - main
+      - bugfix/all-news-remove-captions-text
 
 jobs:
   linter:
