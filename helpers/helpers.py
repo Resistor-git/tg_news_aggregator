@@ -26,10 +26,6 @@ logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
 
-CHANNELS_WITH_TEXT = ("agentstvonews", "novaya_europe", "bbcrussian")
-CHANNELS_WITH_CAPTIONS = ("news_sirena", "fontankaspb")
-
-
 def get_channel_messages(channel_name: str) -> list[Message]:
     """
     Gets messages from the channel for the period of time.
@@ -47,9 +43,7 @@ def get_channel_messages(channel_name: str) -> list[Message]:
             if config.debug:
                 with open("debug.txt", "a", encoding="utf-8") as file:
                     file.write(f"{message},\n")
-            if message.sender_chat.username in CHANNELS_WITH_TEXT and message.text:
-                filtered_messages.append(message)
-            elif message.sender_chat.username in CHANNELS_WITH_CAPTIONS:
+            if message.text or message.caption:
                 filtered_messages.append(message)
     return list(reversed(filtered_messages))
 
@@ -101,18 +95,11 @@ def digest_filter(messages: list[Message]) -> list[Message]:
         r"|дайджест",
         flags=re.IGNORECASE,
     )
-    _digest_channels_with_text: tuple[str, ...] = ("novaya_europe", "fontankaspb")
-    _digest_channels_with_captions: tuple[str, ...] = ("news_sirena",)
     for message in messages:
-        if message.sender_chat.username in _digest_channels_with_text and message.text:
-            if _keywords.search(message.text):
-                digests.append(message)
-        elif (
-            message.sender_chat.username in _digest_channels_with_captions
-            and message.caption
-        ):
-            if _keywords.search(message.caption):
-                digests.append(message)
+        if message.text and _keywords.search(message.text):
+            digests.append(message)
+        elif message.caption and _keywords.search(message.caption):
+            digests.append(message)
     return digests
 
 
