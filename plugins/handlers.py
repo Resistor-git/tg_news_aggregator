@@ -85,14 +85,20 @@ def all_news(client, message: Message):
         )
         return
     try:
-        client.send_message(chat_id=message.chat.id, text=news)
+        client.send_message(
+            chat_id=message.chat.id, text=news, reply_markup=keyboard_main
+        )
     except errors.MessageTooLong:
         logger.debug("long message")
         number_of_messages = (len(news) // config.max_message_length) + 1
         start = 0
         end = config.max_message_length
         for _ in range(number_of_messages):
-            client.send_message(chat_id=message.chat.id, text=news[start:end])
+            client.send_message(
+                chat_id=message.chat.id,
+                text=news[start:end],
+                reply_markup=keyboard_main,
+            )
             start += config.max_message_length
             end += config.max_message_length
     except errors.MessageEmpty:
@@ -130,7 +136,8 @@ def digest(client, message: Message):
     with userbot:
         if not user_channels:
             client.send_message(
-                chat_id=message.chat.id, text=LEXICON["no_subscriptions"]
+                chat_id=message.chat.id,
+                text=LEXICON["no_subscriptions"],
             )
             return
         for channel in user_channels:
@@ -147,6 +154,7 @@ def digest(client, message: Message):
         client.send_message(
             chat_id=message.chat.id,
             text=LEXICON["empty_digest"],
+            reply_markup=keyboard_main,
         )
     logger.info(f"Пользователь {message.from_user.username} воспользовался дайджестом.")
 
