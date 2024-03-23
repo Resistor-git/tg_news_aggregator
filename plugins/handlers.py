@@ -3,8 +3,6 @@ import json
 
 from pyrogram import Client, errors, filters
 from pyrogram.types import (
-    ReplyKeyboardMarkup,
-    KeyboardButton,
     Message,
     InlineKeyboardMarkup,
     CallbackQuery,
@@ -19,10 +17,10 @@ from helpers.helpers import (
     add_new_user_if_not_exists,
     get_user_subscriptions,
 )
-
 from keyboards import (
     keyboard_inline_change_channels,
     keyboard_inline_add_remove_channels,
+    keyboard_main,
 )
 from lexicon import LEXICON, CHANNELS_HUMAN_READABLE
 
@@ -42,13 +40,6 @@ stream_handler.setLevel(logging.DEBUG)
 
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
-
-button_all_news = KeyboardButton("Все новости за 12 часов")
-button_digest = KeyboardButton("Дайджест за 12 часов")
-keyboard_main = ReplyKeyboardMarkup(
-    [[button_all_news, button_digest]],
-    resize_keyboard=True,
-)
 
 
 @Client.on_message(filters.command(["start"]))
