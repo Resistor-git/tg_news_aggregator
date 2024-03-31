@@ -87,6 +87,7 @@ def digest_filter(messages: list[Message]) -> list[Message]:
     _keywords: re.Pattern = re.compile(
         r"(.*Утро.*Главное.*)"
         r"|#водномпосте"
+        r"|#главноезанеделю"
         r"|Что (произошло|случилось) (к|за)"
         r"|#Что_происходит"
         r"|Главное за (день|неделю|выходные)"
