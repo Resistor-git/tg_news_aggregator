@@ -98,9 +98,9 @@ def digest_filter(messages: list[Message]) -> list[Message]:
         flags=re.IGNORECASE,
     )
     for message in messages:
-        if message.text and _keywords.search(message.text):
+        if message.text and _keywords.search(message.text.split("\n")[0]):
             digests.append(message)
-        elif message.caption and _keywords.search(message.caption):
+        elif message.caption and _keywords.search(message.caption.split("\n")[0]):
             digests.append(message)
     return digests
 
