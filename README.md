@@ -27,7 +27,7 @@ In order to use a bot you need to provide some credentials. Pyrogram uses sessio
 - Launch bot again.
 - Ask bot for digest or headers.
 - Enter phone and confirmation code for userbot.
-- If you use remote server: copy `my_bot.session` and `my_userbot.session` into the folder of your project on the remote server (for example: scp my_bot.session username@111.111.111.111:~/tg_news_aggregator)
+- If you use remote server: copy `my_bot.session` and `my_userbot.session` into the folder of your project on the remote server (for example: `scp -i path_to_my_ssh_key my_bot.session username@111.11.11.11:~/tg_news_aggregator`)
 
 How to obtain api_id: https://core.telegram.org/api/obtaining_api_id \
 How to obtain bot token: https://core.telegram.org/bots/tutorial#obtain-your-bot-token
